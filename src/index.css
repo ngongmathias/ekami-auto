@@ -1,0 +1,260 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+@import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+
+/* Base styles */
+@layer base {
+  body {
+    @apply bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-br dark:from-gray-900 dark:via-ekami-charcoal-900 dark:to-black text-ekami-charcoal-800 dark:text-ekami-silver-200;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  }
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Dark mode */
+.dark {
+  color-scheme: dark;
+}
+
+.dark body {
+  background-color: #0B1120;
+  color: #f3f4f6;
+}
+
+/* Custom animations */
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+/* Animated text gradient */
+@keyframes text-gradient {
+  to {
+    background-position: 200% center;
+  }
+}
+
+.animate-text-gradient {
+  background-size: 200% auto;
+  animation: text-gradient 4s linear infinite;
+}
+
+/* Background grid pattern */
+.bg-grid-white {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Glass morphism effect */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .glass {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #8c8c8c;
+  border-radius: 10px;
+  border: 2px solid #f1f1f1;
+  transition: all 0.3s ease;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #6b6b6b;
+  border-color: #1f2937;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #f59e0b;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #d97706;
+}
+
+/* Custom underline animation */
+.hover-underline-animation {
+  position: relative;
+  display: inline-block;
+}
+
+.hover-underline-animation::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: currentColor;
+  transition: width 0.3s ease;
+}
+
+.hover-underline-animation:hover::after {
+  width: 100%;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInOnly {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in-only {
+  animation: fadeInOnly 0.5s ease-out forwards;
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Button styles - Premium rounded with depth */
+.btn-primary {
+  @apply inline-flex items-center justify-center px-8 py-4 border-0 text-base font-semibold rounded-2xl shadow-2xl text-white bg-gradient-to-r from-ekami-silver-600 to-ekami-charcoal-700 hover:from-ekami-silver-700 hover:to-ekami-charcoal-800 focus:outline-none focus:ring-4 focus:ring-ekami-gold-400/50 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-ekami-silver-500/50;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center px-8 py-4 border-2 border-ekami-silver-300 text-base font-semibold rounded-2xl shadow-lg text-ekami-charcoal-700 bg-white/80 backdrop-blur-sm hover:bg-white hover:border-ekami-gold-400 focus:outline-none focus:ring-4 focus:ring-ekami-gold-400/50 transition-all duration-300 transform hover:-translate-y-1;
+}
+
+.dark .btn-secondary {
+  @apply bg-ekami-charcoal-800/80 text-ekami-silver-200 border-ekami-charcoal-600 hover:bg-ekami-charcoal-700 hover:border-ekami-gold-400;
+}
+
+/* Card styles - Glass morphism with rounded corners */
+.card {
+  @apply bg-white/90 backdrop-blur-md rounded-3xl shadow-xl p-8 border border-ekami-silver-200/50 hover:shadow-2xl hover:border-ekami-gold-300/50 transition-all duration-300 transform hover:-translate-y-1;
+}
+
+.dark .card {
+  @apply bg-ekami-charcoal-800/90 border-ekami-charcoal-600/50 hover:border-ekami-gold-400/50;
+}
+
+/* Form styles - Rounded with soft shadows */
+.form-input {
+  @apply w-full px-5 py-4 border-2 border-ekami-silver-300 rounded-2xl bg-white/80 backdrop-blur-sm focus:ring-4 focus:ring-ekami-gold-400/30 focus:border-ekami-gold-400 transition-all duration-200 text-ekami-charcoal-800 placeholder-ekami-charcoal-400;
+}
+
+.dark .form-input {
+  @apply bg-ekami-charcoal-800/80 border-ekami-charcoal-600 text-ekami-silver-200 placeholder-ekami-silver-500;
+}
+
+.form-textarea {
+  @apply w-full px-5 py-4 border-2 border-ekami-silver-300 rounded-2xl bg-white/80 backdrop-blur-sm focus:ring-4 focus:ring-ekami-gold-400/30 focus:border-ekami-gold-400 transition-all duration-200 resize-none text-ekami-charcoal-800 placeholder-ekami-charcoal-400;
+}
+
+.dark .form-textarea {
+  @apply bg-ekami-charcoal-800/80 border-ekami-charcoal-600 text-ekami-silver-200 placeholder-ekami-silver-500;
+}
+
+/* Spinner animation */
+.spinner {
+  @apply animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent;
+}
+
+/* Map z-index overrides */
+.leaflet-container,
+.leaflet-map-pane,
+.leaflet-control-container,
+.leaflet-popup-pane,
+.leaflet-marker-pane,
+.leaflet-tile-pane {
+  z-index: 1 !important;
+}
+
+.leaflet-popup {
+  z-index: 10 !important;
+}
+
+.leaflet-container * {
+  z-index: auto !important;
+}
+
+/* 360 viewer overlay */
+.viewer-360-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Floating chat button */
+.floating-chat-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 80, 164, 0.3);
+}
+
+/* WhatsApp button */
+.whatsapp-btn {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 1000;
+  background: #25D366;
+  color: white;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+  transition: transform 0.2s;
+}
+
+.whatsapp-btn:hover {
+  transform: scale(1.1);
+}
