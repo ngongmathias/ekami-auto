@@ -12,14 +12,20 @@ import HomePage from './pages/HomePage';
 import RentPage from './pages/RentPage';
 import BuyPage from './pages/BuyPage';
 import RepairsPage from './pages/RepairsPage';
+import ServiceRequestPage from './pages/ServiceRequestPage';
 import SellCarPage from './pages/SellCarPage';
 import CarDetailPage from './pages/CarDetailPage';
+import BookingPage from './pages/BookingPage';
+import PaymentPage from './pages/PaymentPage';
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import ComparePage from './pages/ComparePage';
 import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
 import AccountPage from './pages/AccountPage';
 import SignInPage from './pages/SignInPage';
 import SignUpPage from './pages/SignUpPage';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import ContactPage from './pages/ContactPage';
 import './App.css';
 
 const queryClient = new QueryClient({
@@ -49,12 +55,18 @@ function App() {
                       <Route path="rent" element={<RentPage />} />
                       <Route path="buy" element={<BuyPage />} />
                       <Route path="repairs" element={<RepairsPage />} />
+                      <Route path="repairs/request" element={<ServiceRequestPage />} />
                       <Route path="sell" element={<SellCarPage />} />
                       <Route path="cars/:id" element={<CarDetailPage />} />
+                      <Route path="book/:id" element={<BookingPage />} />
+                      <Route path="payment" element={<PaymentPage />} />
+                      <Route path="payment/success" element={<PaymentSuccessPage />} />
                       <Route path="compare" element={<ComparePage />} />
                       <Route path="blog" element={<BlogPage />} />
                       <Route path="blog/:slug" element={<BlogPostPage />} />
                       <Route path="account/*" element={<AccountPage />} />
+                      <Route path="admin" element={<AdminDashboard />} />
+                      <Route path="contact" element={<ContactPage />} />
                     </Route>
                   </Routes>
                 </div>

@@ -16,6 +16,7 @@ export default function Header() {
   const navLinks = [
     { path: '/rent', label: t('nav.rent') },
     { path: '/buy', label: t('nav.buy') },
+    { path: '/compare', label: 'Compare' },
     { path: '/repairs', label: t('nav.repairs') },
     { path: '/sell', label: t('nav.sell') },
     { path: '/blog', label: t('nav.blog') },
@@ -27,11 +28,13 @@ export default function Header() {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
-            <img 
-              src="/logo.jpg" 
-              alt="Ekami Auto" 
-              className="h-12 w-auto object-contain transition-transform group-hover:scale-105"
-            />
+            <div className="relative h-16 w-16 rounded-lg overflow-hidden bg-white dark:bg-ekami-charcoal-800 shadow-md ring-2 ring-ekami-silver-300 dark:ring-ekami-charcoal-600 transition-all group-hover:ring-ekami-gold-400 group-hover:shadow-lg">
+              <img 
+                src="/logo.jpg" 
+                alt="Ekami Auto" 
+                className="h-full w-full object-cover transition-transform group-hover:scale-110"
+              />
+            </div>
             <span className="text-2xl font-display font-bold bg-gradient-to-r from-ekami-silver-400 to-ekami-silver-600 bg-clip-text text-transparent dark:from-ekami-silver-200 dark:to-ekami-silver-400">
               EKAMI AUTO
             </span>

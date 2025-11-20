@@ -224,6 +224,19 @@ export interface UserProfile {
 // Helper functions for common queries
 
 /**
+ * Get all cars (for admin)
+ */
+export async function getAllCars() {
+  const { data, error } = await supabase
+    .from('cars')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data as Car[];
+}
+
+/**
  * Get all available cars for rent
  */
 export async function getAvailableCarsForRent() {

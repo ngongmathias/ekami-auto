@@ -2,6 +2,7 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 @import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+@import 'react-datepicker/dist/react-datepicker.css';
 
 /* Base styles */
 @layer base {
@@ -228,33 +229,13 @@
   justify-content: center;
 }
 
-/* Floating chat button */
+/* Floating chat button - AI Assistant */
 .floating-chat-btn {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 1000;
+  z-index: 1001;
   box-shadow: 0 4px 12px rgba(0, 80, 164, 0.3);
 }
 
-/* WhatsApp button */
-.whatsapp-btn {
-  position: fixed;
-  bottom: 24px;
-  left: 24px;
-  z-index: 1000;
-  background: #25D366;
-  color: white;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
-  transition: transform 0.2s;
-}
-
-.whatsapp-btn:hover {
-  transform: scale(1.1);
-}
+/* WhatsApp button styles moved to component (using Tailwind) */
