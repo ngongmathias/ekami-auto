@@ -9,6 +9,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import theme from './lib/theme';
 import Layout from './components/common/Layout';
+import AnalyticsWrapper from './components/common/AnalyticsWrapper';
 import HomePage from './pages/HomePage';
 import RentPage from './pages/RentPage';
 import BuyPage from './pages/BuyPage';
@@ -49,8 +50,9 @@ function App() {
             <ThemeProvider>
               <CurrencyProvider>
                 <Router>
-                <div className="App">
-                  <Routes>
+                  <AnalyticsWrapper>
+                    <div className="App">
+                      <Routes>
                     <Route path="/" element={<Layout />}>
                       <Route index element={<HomePage />} />
                       <Route path="sign-in" element={<SignInPage />} />
@@ -72,8 +74,9 @@ function App() {
                       <Route path="admin" element={<AdminDashboard />} />
                       <Route path="contact" element={<ContactPage />} />
                     </Route>
-                  </Routes>
-                </div>
+                      </Routes>
+                    </div>
+                  </AnalyticsWrapper>
                 </Router>
                 <Toaster position="top-right" />
               </CurrencyProvider>
