@@ -1,5 +1,4 @@
 {
-  "installCommand": "npm install && npm install @rollup/rollup-linux-x64-gnu --save-optional",
   "buildCommand": "npm run build",
   "framework": "vite",
   "rewrites": [
