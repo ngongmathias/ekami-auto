@@ -53,12 +53,7 @@ export default function ReviewList({ carId }: ReviewListProps) {
       // Fetch approved reviews
       let query = supabase
         .from('reviews')
-        .select(`
-          *,
-          user_profiles!reviews_user_id_fkey (
-            full_name
-          )
-        `)
+        .select('*')
         .eq('car_id', carId)
         .eq('status', 'approved');
 
@@ -90,7 +85,7 @@ export default function ReviewList({ carId }: ReviewListProps) {
       // Transform data
       const transformedReviews = data?.map((review: any) => ({
         ...review,
-        user_name: review.user_profiles?.full_name || 'Anonymous User',
+        user_name: review.user_name || 'Anonymous User',
         verified_purchase: !!review.booking_id,
       })) || [];
 

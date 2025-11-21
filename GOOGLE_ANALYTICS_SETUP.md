@@ -27,7 +27,7 @@
 1. In Admin → Property → **Data Streams**
 2. Click **Add stream** → **Web**
 3. Enter:
-   - **Website URL:** https://your-site.vercel.app
+   - **Website URL:** https://ekamiauto.com
    - **Stream name:** Ekami Auto Website
 4. Click **Create stream**
 5. Copy your **Measurement ID** (looks like `G-XXXXXXXXXX`)
