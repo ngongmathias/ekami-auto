@@ -42,7 +42,7 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden lg:flex items-center space-x-6">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
@@ -55,17 +55,17 @@ export default function Header() {
           </nav>
 
           {/* Right side controls */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
             {/* Language Toggle */}
             <button
               onClick={() => changeLanguage(language === 'en' ? 'fr' : 'en')}
-              className="px-3 py-1 text-sm font-medium text-ekami-charcoal-700 dark:text-ekami-silver-300 hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-800 rounded-md transition-colors"
+              className="hidden lg:flex px-2 py-1 text-xs font-medium text-ekami-charcoal-700 dark:text-ekami-silver-300 hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-800 rounded-md transition-colors"
             >
               {language === 'en' ? 'FR' : 'EN'}
             </button>
 
             {/* Currency Selector */}
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <CurrencySelector />
             </div>
 
@@ -80,13 +80,13 @@ export default function Header() {
 
             {/* Auth */}
             {isSignedIn ? (
-              <div className="hidden md:flex items-center space-x-3">
+              <div className="hidden md:flex items-center space-x-2">
                 <Link
                   to="/account"
-                  className="flex items-center space-x-2 px-4 py-2 text-ekami-charcoal-700 dark:text-ekami-silver-300 hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-800 rounded-md transition-colors"
+                  className="flex items-center space-x-1 px-3 py-2 text-ekami-charcoal-700 dark:text-ekami-silver-300 hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-800 rounded-md transition-colors text-sm"
                 >
-                  <User className="w-5 h-5" />
-                  <span>{user?.firstName || t('nav.account')}</span>
+                  <User className="w-4 h-4" />
+                  <span className="hidden xl:inline">{user?.firstName || t('nav.account')}</span>
                 </Link>
                 <button
                   onClick={() => signOut()}
@@ -97,16 +97,16 @@ export default function Header() {
                 </button>
               </div>
             ) : (
-              <div className="hidden md:flex items-center space-x-3">
+              <div className="hidden md:flex items-center space-x-2">
                 <Link
                   to="/sign-in"
-                  className="px-4 py-2 text-ekami-charcoal-700 dark:text-ekami-silver-300 hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-800 rounded-md transition-colors font-medium"
+                  className="px-3 py-2 text-ekami-charcoal-700 dark:text-ekami-silver-300 hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-800 rounded-md transition-colors text-sm font-medium"
                 >
                   {t('nav.login')}
                 </Link>
                 <Link
                   to="/sign-up"
-                  className="px-4 py-2 bg-gradient-to-r from-ekami-silver-600 to-ekami-charcoal-700 text-white rounded-md hover:from-ekami-silver-700 hover:to-ekami-charcoal-800 transition-all shadow-lg font-medium"
+                  className="px-3 py-2 bg-gradient-to-r from-ekami-silver-600 to-ekami-charcoal-700 text-white rounded-md hover:from-ekami-silver-700 hover:to-ekami-charcoal-800 transition-all shadow-lg text-sm font-medium"
                 >
                   {t('nav.signup')}
                 </Link>
