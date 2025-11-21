@@ -6,6 +6,7 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { CurrencyProvider } from './contexts/CurrencyContext';
 import theme from './lib/theme';
 import Layout from './components/common/Layout';
 import HomePage from './pages/HomePage';
@@ -46,7 +47,8 @@ function App() {
         <LanguageProvider>
           <AuthProvider>
             <ThemeProvider>
-              <Router>
+              <CurrencyProvider>
+                <Router>
                 <div className="App">
                   <Routes>
                     <Route path="/" element={<Layout />}>
@@ -72,8 +74,9 @@ function App() {
                     </Route>
                   </Routes>
                 </div>
-              </Router>
-              <Toaster position="top-right" />
+                </Router>
+                <Toaster position="top-right" />
+              </CurrencyProvider>
             </ThemeProvider>
           </AuthProvider>
         </LanguageProvider>

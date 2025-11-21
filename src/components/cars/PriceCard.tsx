@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Calendar, Phone, MessageCircle, ShoppingCart, CheckCircle, TrendingUp, Calculator, GitCompare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Car } from '../../lib/supabase';
+import { useCurrency } from '../../contexts/CurrencyContext';
 import PurchaseInquiryModal from './PurchaseInquiryModal';
 import MakeOfferModal from './MakeOfferModal';
 import FinancingCalculator from './FinancingCalculator';
@@ -11,6 +12,7 @@ interface PriceCardProps {
 }
 
 export default function PriceCard({ car }: PriceCardProps) {
+  const { formatPrice } = useCurrency();
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [showFinancing, setShowFinancing] = useState(false);
@@ -33,10 +35,7 @@ export default function PriceCard({ car }: PriceCardProps) {
             <div className="mb-4">
               <div className="flex items-baseline space-x-2">
                 <span className="text-4xl font-bold text-ekami-gold-600">
-                  {car.price_rent_daily.toLocaleString()}
-                </span>
-                <span className="text-xl text-ekami-charcoal-600 dark:text-ekami-silver-400">
-                  XAF
+                  {formatPrice(car.price_rent_daily)}
                 </span>
                 <span className="text-sm text-ekami-charcoal-500 dark:text-ekami-silver-500">
                   / day
@@ -51,7 +50,7 @@ export default function PriceCard({ car }: PriceCardProps) {
                       Weekly rate:
                     </span>
                     <span className="font-semibold text-ekami-charcoal-900 dark:text-white">
-                      {car.price_rent_weekly.toLocaleString()} XAF
+                      {formatPrice(car.price_rent_weekly)}
                     </span>
                   </div>
                 )}
@@ -61,7 +60,7 @@ export default function PriceCard({ car }: PriceCardProps) {
                       Monthly rate:
                     </span>
                     <span className="font-semibold text-ekami-charcoal-900 dark:text-white">
-                      {car.price_rent_monthly.toLocaleString()} XAF
+                      {formatPrice(car.price_rent_monthly)}
                     </span>
                   </div>
                 )}
@@ -73,10 +72,7 @@ export default function PriceCard({ car }: PriceCardProps) {
             <div className="mb-4">
               <div className="flex items-baseline space-x-2">
                 <span className="text-4xl font-bold text-ekami-gold-600">
-                  {car.price_sale.toLocaleString()}
-                </span>
-                <span className="text-xl text-ekami-charcoal-600 dark:text-ekami-silver-400">
-                  XAF
+                  {formatPrice(car.price_sale)}
                 </span>
               </div>
               <p className="text-sm text-ekami-charcoal-500 dark:text-ekami-silver-500 mt-1">

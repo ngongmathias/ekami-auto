@@ -5,6 +5,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { Moon, Sun, User, LogOut, Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import CurrencySelector from './CurrencySelector';
 
 export default function Header() {
   const { t } = useTranslation();
@@ -62,6 +63,11 @@ export default function Header() {
             >
               {language === 'en' ? 'FR' : 'EN'}
             </button>
+
+            {/* Currency Selector */}
+            <div className="hidden md:block">
+              <CurrencySelector />
+            </div>
 
             {/* Dark Mode Toggle */}
             <button
