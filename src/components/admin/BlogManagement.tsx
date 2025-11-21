@@ -11,7 +11,7 @@ interface BlogPost {
   slug: string;
   excerpt?: string;
   content?: string;
-  status: string;
+  status: 'draft' | 'published' | 'archived';
   published_at?: string;
   created_at: string;
   author_name?: string;
