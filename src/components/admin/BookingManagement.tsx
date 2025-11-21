@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Search, Filter, Eye, CheckCircle, XCircle, Calendar, Download } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Search, Filter, Eye, CheckCircle, XCircle, Calendar, Download, Edit, Play, Flag, User } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { supabase } from '../../lib/supabase';
 
@@ -16,7 +16,16 @@ interface Booking {
   status: string;
   driver_name?: string;
   driver_phone?: string;
+  driver_license?: string;
   pickup_location?: string;
+  dropoff_location?: string;
+  booking_reference?: string;
+  customer_name?: string;
+  customer_email?: string;
+  customer_phone?: string;
+  special_requests?: string;
+  admin_notes?: string;
+  payment_method?: string;
   // Joined data
   cars?: { make: string; model: string; year: number };
 }
@@ -26,6 +35,11 @@ export default function BookingManagement() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [adminNotes, setAdminNotes] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedBooking, setEditedBooking] = useState<Partial<Booking>>({});
 
   useEffect(() => {
     fetchBookings();
@@ -267,25 +281,51 @@ export default function BookingManagement() {
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center justify-end space-x-2">
+                        {/* Status workflow buttons */}
                         {booking.status === 'pending' && (
-                          <>
-                            <button
-                              onClick={() => handleUpdateStatus(booking.id, 'confirmed')}
-                              className="p-2 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-colors"
-                              title="Confirm"
-                            >
-                              <CheckCircle className="w-4 h-4 text-green-600" />
-                            </button>
-                            <button
-                              onClick={() => handleUpdateStatus(booking.id, 'cancelled')}
-                              className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
-                              title="Cancel"
-                            >
-                              <XCircle className="w-4 h-4 text-red-600" />
-                            </button>
-                          </>
+                          <button
+                            onClick={() => handleUpdateStatus(booking.id, 'confirmed')}
+                            className="px-3 py-1 bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:hover:bg-green-900/50 text-green-700 dark:text-green-300 rounded-lg text-xs font-medium transition-colors"
+                            title="Confirm Booking"
+                          >
+                            Confirm
+                          </button>
+                        )}
+                        {booking.status === 'confirmed' && (
+                          <button
+                            onClick={() => handleUpdateStatus(booking.id, 'active')}
+                            className="px-3 py-1 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+                            title="Start Rental"
+                          >
+                            <Play className="w-3 h-3" />
+                            Start
+                          </button>
+                        )}
+                        {booking.status === 'active' && (
+                          <button
+                            onClick={() => handleUpdateStatus(booking.id, 'completed')}
+                            className="px-3 py-1 bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/30 dark:hover:bg-purple-900/50 text-purple-700 dark:text-purple-300 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+                            title="Complete Rental"
+                          >
+                            <Flag className="w-3 h-3" />
+                            Complete
+                          </button>
+                        )}
+                        {(booking.status === 'pending' || booking.status === 'confirmed') && (
+                          <button
+                            onClick={() => handleUpdateStatus(booking.id, 'cancelled')}
+                            className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                            title="Cancel"
+                          >
+                            <XCircle className="w-4 h-4 text-red-600" />
+                          </button>
                         )}
                         <button
+                          onClick={() => {
+                            setSelectedBooking(booking);
+                            setAdminNotes(booking.admin_notes || '');
+                            setShowDetailsModal(true);
+                          }}
                           className="p-2 hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-700 rounded-lg transition-colors"
                           title="View Details"
                         >
@@ -300,6 +340,269 @@ export default function BookingManagement() {
           </div>
         )}
       </div>
+
+      {/* Details Modal */}
+      <AnimatePresence>
+        {showDetailsModal && selectedBooking && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white dark:bg-ekami-charcoal-800 rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+            >
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-2xl font-bold text-ekami-charcoal-900 dark:text-white">
+                    {isEditing ? 'Edit Booking' : 'Booking Details'}
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    {!isEditing && (
+                      <button
+                        onClick={() => {
+                          setIsEditing(true);
+                          setEditedBooking(selectedBooking || {});
+                        }}
+                        className="p-2 hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-700 rounded-lg transition-colors"
+                        title="Edit Booking"
+                      >
+                        <Edit className="w-5 h-5 text-ekami-gold-600" />
+                      </button>
+                    )}
+                    <button
+                      onClick={() => {
+                        setShowDetailsModal(false);
+                        setIsEditing(false);
+                      }}
+                      className="text-ekami-charcoal-400 hover:text-ekami-charcoal-600"
+                    >
+                      <XCircle className="w-6 h-6" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  {/* Booking Info */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400">Booking Reference</p>
+                      <p className="font-semibold text-ekami-charcoal-900 dark:text-white">
+                        {selectedBooking.booking_reference || `#${selectedBooking.id.slice(0, 8)}`}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400">Status</p>
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(selectedBooking.status)}`}>
+                        {selectedBooking.status}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Customer Info */}
+                  <div>
+                    <h4 className="font-semibold text-ekami-charcoal-900 dark:text-white mb-3">Customer Information</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400 mb-1">Name</p>
+                        {isEditing ? (
+                          <input
+                            type="text"
+                            value={editedBooking.customer_name || editedBooking.driver_name || ''}
+                            onChange={(e) => setEditedBooking({ ...editedBooking, customer_name: e.target.value, driver_name: e.target.value })}
+                            className="w-full px-3 py-2 border border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-lg focus:ring-2 focus:ring-ekami-gold-500 dark:bg-ekami-charcoal-900 dark:text-white"
+                          />
+                        ) : (
+                          <p className="font-medium text-ekami-charcoal-900 dark:text-white">
+                            {selectedBooking.customer_name || selectedBooking.driver_name || 'N/A'}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400 mb-1">Email</p>
+                        {isEditing ? (
+                          <input
+                            type="email"
+                            value={editedBooking.customer_email || ''}
+                            onChange={(e) => setEditedBooking({ ...editedBooking, customer_email: e.target.value })}
+                            className="w-full px-3 py-2 border border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-lg focus:ring-2 focus:ring-ekami-gold-500 dark:bg-ekami-charcoal-900 dark:text-white"
+                          />
+                        ) : (
+                          <p className="font-medium text-ekami-charcoal-900 dark:text-white">
+                            {selectedBooking.customer_email || 'N/A'}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400 mb-1">Phone</p>
+                        {isEditing ? (
+                          <input
+                            type="tel"
+                            value={editedBooking.customer_phone || editedBooking.driver_phone || ''}
+                            onChange={(e) => setEditedBooking({ ...editedBooking, customer_phone: e.target.value, driver_phone: e.target.value })}
+                            className="w-full px-3 py-2 border border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-lg focus:ring-2 focus:ring-ekami-gold-500 dark:bg-ekami-charcoal-900 dark:text-white"
+                          />
+                        ) : (
+                          <p className="font-medium text-ekami-charcoal-900 dark:text-white">
+                            {selectedBooking.customer_phone || selectedBooking.driver_phone || 'N/A'}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400 mb-1">Driver License</p>
+                        {isEditing ? (
+                          <input
+                            type="text"
+                            value={editedBooking.driver_license || ''}
+                            onChange={(e) => setEditedBooking({ ...editedBooking, driver_license: e.target.value })}
+                            className="w-full px-3 py-2 border border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-lg focus:ring-2 focus:ring-ekami-gold-500 dark:bg-ekami-charcoal-900 dark:text-white"
+                          />
+                        ) : (
+                          <p className="font-medium text-ekami-charcoal-900 dark:text-white">
+                            {selectedBooking.driver_license || 'N/A'}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Car & Dates */}
+                  <div>
+                    <h4 className="font-semibold text-ekami-charcoal-900 dark:text-white mb-3">Rental Details</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400">Vehicle</p>
+                        <p className="font-medium text-ekami-charcoal-900 dark:text-white">
+                          {selectedBooking.cars ? `${selectedBooking.cars.make} ${selectedBooking.cars.model} ${selectedBooking.cars.year}` : 'N/A'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400">Duration</p>
+                        <p className="font-medium text-ekami-charcoal-900 dark:text-white">
+                          {new Date(selectedBooking.start_date).toLocaleDateString()} - {new Date(selectedBooking.end_date).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400">Pickup Location</p>
+                        <p className="font-medium text-ekami-charcoal-900 dark:text-white">
+                          {selectedBooking.pickup_location || 'N/A'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400">Dropoff Location</p>
+                        <p className="font-medium text-ekami-charcoal-900 dark:text-white">
+                          {selectedBooking.dropoff_location || 'N/A'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Payment */}
+                  <div>
+                    <h4 className="font-semibold text-ekami-charcoal-900 dark:text-white mb-3">Payment Information</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400">Total Amount</p>
+                        <p className="text-xl font-bold text-ekami-gold-600">
+                          {selectedBooking.total_amount.toLocaleString()} XAF
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400">Payment Status</p>
+                        <p className="font-medium text-ekami-charcoal-900 dark:text-white capitalize">
+                          {selectedBooking.payment_status}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400">Payment Method</p>
+                        <p className="font-medium text-ekami-charcoal-900 dark:text-white capitalize">
+                          {selectedBooking.payment_method || 'N/A'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Special Requests */}
+                  {selectedBooking.special_requests && (
+                    <div>
+                      <h4 className="font-semibold text-ekami-charcoal-900 dark:text-white mb-2">Special Requests</h4>
+                      <p className="text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400">
+                        {selectedBooking.special_requests}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Admin Notes */}
+                  <div>
+                    <h4 className="font-semibold text-ekami-charcoal-900 dark:text-white mb-2">Admin Notes</h4>
+                    <textarea
+                      value={adminNotes}
+                      onChange={(e) => setAdminNotes(e.target.value)}
+                      rows={4}
+                      className="w-full px-4 py-2 border border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-lg focus:ring-2 focus:ring-ekami-gold-500 dark:bg-ekami-charcoal-900 dark:text-white"
+                      placeholder="Add internal notes about this booking..."
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-6 flex justify-end gap-3">
+                  {isEditing && (
+                    <button
+                      onClick={() => {
+                        setIsEditing(false);
+                        setEditedBooking({});
+                      }}
+                      className="px-4 py-2 text-ekami-charcoal-700 dark:text-ekami-silver-300 hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-700 rounded-lg"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                  {!isEditing && (
+                    <button
+                      onClick={() => {
+                        setShowDetailsModal(false);
+                        setIsEditing(false);
+                      }}
+                      className="px-4 py-2 text-ekami-charcoal-700 dark:text-ekami-silver-300 hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-700 rounded-lg"
+                    >
+                      Close
+                    </button>
+                  )}
+                  <button
+                    onClick={async () => {
+                      try {
+                        const updateData = isEditing ? {
+                          ...editedBooking,
+                          admin_notes: adminNotes
+                        } : {
+                          admin_notes: adminNotes
+                        };
+
+                        const { error } = await supabase
+                          .from('bookings')
+                          .update(updateData)
+                          .eq('id', selectedBooking.id);
+
+                        if (error) throw error;
+
+                        toast.success(isEditing ? 'Booking updated' : 'Notes saved');
+                        setShowDetailsModal(false);
+                        setIsEditing(false);
+                        setEditedBooking({});
+                        fetchBookings();
+                      } catch (error) {
+                        toast.error('Failed to save changes');
+                      }
+                    }}
+                    className="px-4 py-2 bg-ekami-gold-600 hover:bg-ekami-gold-700 text-white rounded-lg"
+                  >
+                    {isEditing ? 'Save Changes' : 'Save Notes'}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

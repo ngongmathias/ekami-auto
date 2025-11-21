@@ -14,15 +14,26 @@ import {
   Package,
   Settings,
   BarChart3,
+  Wrench,
+  Star,
+  Upload,
+  MessageSquare,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { supabase } from '../../lib/supabase';
 import CarManagement from '../../components/admin/CarManagement';
 import BookingManagement from '../../components/admin/BookingManagement';
+import PurchasesManagement from '../../components/admin/PurchasesManagement';
+import SellRequestsManagement from '../../components/admin/SellRequestsManagement';
 import CustomerList from '../../components/admin/CustomerList';
 import BlogManagement from '../../components/admin/BlogManagement';
+import CommentsModeration from '../../components/admin/CommentsModeration';
+import RepairsManagement from '../../components/admin/RepairsManagement';
+import MechanicsManagement from '../../components/admin/MechanicsManagement';
+import ReviewsManagement from '../../components/admin/ReviewsManagement';
 
-type TabType = 'overview' | 'cars' | 'bookings' | 'customers' | 'analytics' | 'blog';
+type TabType = 'overview' | 'cars' | 'bookings' | 'purchases' | 'sell-requests' | 'repairs' | 'mechanics' | 'reviews' | 'customers' | 'analytics' | 'blog' | 'comments';
 
 export default function AdminDashboard() {
   const { isSignedIn, isLoaded, user } = useAuth();
@@ -44,39 +55,44 @@ export default function AdminDashboard() {
       try {
         setLoading(true);
         
-        // In production, fetch from Supabase with admin permissions
-        // const { data } = await supabase.rpc('get_admin_stats');
-        
-        // Mock data for demo
-        const mockStats = {
-          totalRevenue: 12500000,
-          totalBookings: 48,
-          totalCars: 12,
-          totalCustomers: 156,
-          activeBookings: 8,
-          pendingPayments: 3,
-          availableCars: 9,
-          recentBookings: [
-            {
-              id: '1',
-              customer: 'John Doe',
-              car: 'Mercedes-Benz S-Class',
-              amount: 875000,
-              status: 'confirmed',
-              date: new Date().toISOString(),
-            },
-            {
-              id: '2',
-              customer: 'Jane Smith',
-              car: 'BMW 7 Series',
-              amount: 650000,
-              status: 'pending',
-              date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-            },
-          ],
+        // Fetch real data from Supabase
+        const [bookingsRes, carsRes] = await Promise.all([
+          supabase.from('bookings').select('*, cars(make, model, year)'),
+          supabase.from('cars').select('*')
+        ]);
+
+        const bookings = bookingsRes.data || [];
+        const cars = carsRes.data || [];
+
+        // Calculate stats
+        const totalRevenue = bookings
+          .filter(b => b.payment_status === 'paid')
+          .reduce((sum, b) => sum + (b.total_amount || 0), 0);
+
+        const recentBookings = bookings
+          .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+          .slice(0, 5)
+          .map(b => ({
+            id: b.id,
+            customer: b.customer_name || b.driver_name || 'Unknown',
+            car: b.cars ? `${b.cars.make} ${b.cars.model} ${b.cars.year}` : 'Unknown Car',
+            amount: b.total_amount,
+            status: b.status,
+            date: b.created_at,
+          }));
+
+        const calculatedStats = {
+          totalRevenue,
+          totalBookings: bookings.length,
+          totalCars: cars.length,
+          totalCustomers: new Set(bookings.map(b => b.user_id).filter(Boolean)).size,
+          activeBookings: bookings.filter(b => b.status === 'active').length,
+          pendingPayments: bookings.filter(b => b.payment_status === 'pending').length,
+          availableCars: cars.filter(c => c.available_for_rent && c.status === 'available').length,
+          recentBookings,
         };
 
-        setStats(mockStats);
+        setStats(calculatedStats);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching admin data:', error);
@@ -130,8 +146,14 @@ export default function AdminDashboard() {
     { id: 'overview' as TabType, label: 'Overview', icon: LayoutDashboard },
     { id: 'cars' as TabType, label: 'Cars', icon: Car },
     { id: 'bookings' as TabType, label: 'Bookings', icon: Calendar },
+    { id: 'purchases' as TabType, label: 'Purchases', icon: DollarSign },
+    { id: 'sell-requests' as TabType, label: 'Sell Requests', icon: Upload },
+    { id: 'repairs' as TabType, label: 'Repairs', icon: Settings },
+    { id: 'mechanics' as TabType, label: 'Mechanics', icon: Wrench },
+    { id: 'reviews' as TabType, label: 'Reviews', icon: Star },
     { id: 'customers' as TabType, label: 'Customers', icon: Users },
     { id: 'blog' as TabType, label: 'Blog', icon: Package },
+    { id: 'comments' as TabType, label: 'Comments', icon: MessageSquare },
     { id: 'analytics' as TabType, label: 'Analytics', icon: BarChart3 },
   ];
 
@@ -391,9 +413,21 @@ export default function AdminDashboard() {
 
           {activeTab === 'bookings' && <BookingManagement />}
 
+          {activeTab === 'purchases' && <PurchasesManagement />}
+
+          {activeTab === 'sell-requests' && <SellRequestsManagement />}
+
+          {activeTab === 'repairs' && <RepairsManagement />}
+
+          {activeTab === 'mechanics' && <MechanicsManagement />}
+
+          {activeTab === 'reviews' && <ReviewsManagement />}
+
           {activeTab === 'customers' && <CustomerList />}
 
           {activeTab === 'blog' && <BlogManagement />}
+
+          {activeTab === 'comments' && <CommentsModeration />}
 
           {activeTab === 'analytics' && (
             <div className="card text-center py-12">

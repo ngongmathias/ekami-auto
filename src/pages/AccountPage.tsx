@@ -45,32 +45,46 @@ export default function AccountPage() {
       try {
         setLoading(true);
         
-        // In production, fetch from Supabase
-        // const { data: bookingsData } = await supabase
-        //   .from('bookings')
-        //   .select('*')
-        //   .eq('user_id', user.id);
-        
-        // Mock data for demo
-        const mockBookings: Booking[] = [
-          {
-            id: '1',
-            carId: '1',
-            carName: 'Mercedes-Benz S-Class 2023',
-            carImage: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800',
-            startDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-            endDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-            pickupLocation: 'Douala Airport',
-            dropoffLocation: 'Douala Airport',
-            totalAmount: 875000,
-            status: 'upcoming',
-            paymentStatus: 'paid',
-            bookingReference: 'BK' + Date.now(),
-            createdAt: new Date().toISOString(),
-          },
-        ];
-
-        setBookings(mockBookings);
+        // Fetch bookings from Supabase
+        if (user?.id) {
+          const { data: bookingsData, error: bookingsError } = await supabase
+            .from('bookings')
+            .select(`
+              *,
+              cars (
+                id,
+                make,
+                model,
+                year,
+                images
+              )
+            `)
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
+          
+          if (!bookingsError && bookingsData) {
+            // Transform the data to match the Booking interface
+            const transformedBookings: Booking[] = bookingsData.map((booking: any) => ({
+              id: booking.id,
+              carId: booking.car_id,
+              carName: booking.cars ? `${booking.cars.make} ${booking.cars.model} ${booking.cars.year}` : 'Unknown Car',
+              carImage: booking.cars?.images?.[0] || 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800',
+              startDate: booking.start_date,
+              endDate: booking.end_date,
+              pickupLocation: booking.pickup_location,
+              dropoffLocation: booking.dropoff_location,
+              totalAmount: booking.total_amount,
+              status: booking.status,
+              paymentStatus: booking.payment_status,
+              bookingReference: booking.booking_reference,
+              createdAt: booking.created_at,
+            }));
+            
+            setBookings(transformedBookings);
+          } else {
+            setBookings([]);
+          }
+        }
         
         // Fetch service requests from Supabase
         if (user?.id) {

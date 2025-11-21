@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Eye, Search, Filter, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { supabase } from '../../lib/supabase';
 import { getAllCars, type Car } from '../../lib/supabase';
 
 export default function CarManagement() {
@@ -11,6 +12,40 @@ export default function CarManagement() {
   const [filterStatus, setFilterStatus] = useState<'all' | 'available' | 'rented'>('all');
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
+  const [formData, setFormData] = useState<Partial<Car>>({
+    make: '',
+    model: '',
+    year: new Date().getFullYear(),
+    price_rent_daily: 0,
+    price_sale: 0,
+    available_for_rent: true,
+    available_for_sale: false,
+    images: [],
+    features: [],
+    body_type: 'sedan',
+    status: 'available',
+    is_verified: true,
+  });
+  const [uploadingImages, setUploadingImages] = useState(false);
+
+  const resetForm = () => {
+    setFormData({
+      make: '',
+      model: '',
+      year: new Date().getFullYear(),
+      price_rent_daily: 0,
+      price_sale: 0,
+      available_for_rent: true,
+      available_for_sale: false,
+      images: [],
+      features: [],
+      body_type: 'sedan',
+      status: 'available',
+      is_verified: true,
+    });
+    setSelectedCar(null);
+    setShowAddModal(false);
+  };
 
   useEffect(() => {
     fetchCars();
@@ -50,6 +85,51 @@ export default function CarManagement() {
       ));
     } catch (error) {
       toast.error('Failed to update car status');
+    }
+  };
+
+  const handleImageUpload = async (files: FileList) => {
+    try {
+      setUploadingImages(true);
+      const uploadedUrls: string[] = [];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `car-images/${fileName}`;
+
+        // Upload to Supabase Storage
+        const { error: uploadError, data } = await supabase.storage
+          .from('cars')
+          .upload(filePath, file);
+
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          toast.error(`Failed to upload ${file.name}`);
+          continue;
+        }
+
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('cars')
+          .getPublicUrl(filePath);
+
+        uploadedUrls.push(publicUrl);
+      }
+
+      // Add uploaded URLs to existing images
+      setFormData({
+        ...formData,
+        images: [...(formData.images || []), ...uploadedUrls]
+      });
+
+      toast.success(`${uploadedUrls.length} image(s) uploaded successfully`);
+    } catch (error) {
+      console.error('Error uploading images:', error);
+      toast.error('Failed to upload images');
+    } finally {
+      setUploadingImages(false);
     }
   };
 
@@ -226,6 +306,7 @@ export default function CarManagement() {
                         <button
                           onClick={() => {
                             setSelectedCar(car);
+                            setFormData(car);
                             setShowAddModal(true);
                           }}
                           className="p-2 hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-700 rounded-lg transition-colors"
@@ -259,10 +340,7 @@ export default function CarManagement() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black/50 z-50"
-              onClick={() => {
-                setShowAddModal(false);
-                setSelectedCar(null);
-              }}
+              onClick={resetForm}
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
@@ -276,24 +354,370 @@ export default function CarManagement() {
                     {selectedCar ? 'Edit Car' : 'Add New Car'}
                   </h3>
                   <button
-                    onClick={() => {
-                      setShowAddModal(false);
-                      setSelectedCar(null);
-                    }}
+                    onClick={resetForm}
                     className="p-2 hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-700 rounded-lg"
                   >
                     <X className="w-6 h-6" />
                   </button>
                 </div>
-                <p className="text-ekami-charcoal-600 dark:text-ekami-silver-400">
-                  Car form will be here. This requires Supabase integration to save data.
-                </p>
-                <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
-                  <p className="text-sm text-blue-800 dark:text-blue-300">
-                    <strong>Note:</strong> To enable adding/editing cars, you'll need to set up Supabase RLS policies
-                    that allow authenticated admin users to insert and update the cars table.
-                  </p>
-                </div>
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  try {
+                    if (selectedCar) {
+                      // Update existing car
+                      const { error } = await supabase
+                        .from('cars')
+                        .update(formData)
+                        .eq('id', selectedCar.id);
+                      
+                      if (error) throw error;
+                      toast.success('Car updated successfully');
+                    } else {
+                      // Add new car
+                      const { error } = await supabase
+                        .from('cars')
+                        .insert(formData);
+                      
+                      if (error) throw error;
+                      toast.success('Car added successfully');
+                    }
+                    
+                    resetForm();
+                    fetchCars();
+                  } catch (error: any) {
+                    console.error('Error saving car:', error);
+                    toast.error(error.message || 'Failed to save car');
+                  }
+                }} className="space-y-6">
+                  {/* Basic Info */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
+                        Make *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.make || ''}
+                        onChange={(e) => setFormData({ ...formData, make: e.target.value })}
+                        className="w-full px-4 py-2 border border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-lg focus:ring-2 focus:ring-ekami-gold-500 dark:bg-ekami-charcoal-900 dark:text-white"
+                        placeholder="Toyota"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
+                        Model *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.model || ''}
+                        onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+                        className="w-full px-4 py-2 border border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-lg focus:ring-2 focus:ring-ekami-gold-500 dark:bg-ekami-charcoal-900 dark:text-white"
+                        placeholder="Camry"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
+                        Year *
+                      </label>
+                      <input
+                        type="number"
+                        required
+                        value={formData.year || new Date().getFullYear()}
+                        onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) })}
+                        className="w-full px-4 py-2 border border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-lg focus:ring-2 focus:ring-ekami-gold-500 dark:bg-ekami-charcoal-900 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
+                        Body Type
+                      </label>
+                      <select
+                        value={formData.body_type || 'sedan'}
+                        onChange={(e) => setFormData({ ...formData, body_type: e.target.value })}
+                        className="w-full px-4 py-2 border border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-lg focus:ring-2 focus:ring-ekami-gold-500 dark:bg-ekami-charcoal-900 dark:text-white"
+                      >
+                        <option value="sedan">Sedan</option>
+                        <option value="suv">SUV</option>
+                        <option value="truck">Truck</option>
+                        <option value="van">Van</option>
+                        <option value="coupe">Coupe</option>
+                        <option value="convertible">Convertible</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Pricing */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
+                        Daily Rent Price (XAF)
+                      </label>
+                      <input
+                        type="number"
+                        value={formData.price_rent_daily || 0}
+                        onChange={(e) => setFormData({ ...formData, price_rent_daily: parseFloat(e.target.value) })}
+                        className="w-full px-4 py-2 border border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-lg focus:ring-2 focus:ring-ekami-gold-500 dark:bg-ekami-charcoal-900 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
+                        Sale Price (XAF)
+                      </label>
+                      <input
+                        type="number"
+                        value={formData.price_sale || 0}
+                        onChange={(e) => setFormData({ ...formData, price_sale: parseFloat(e.target.value) })}
+                        className="w-full px-4 py-2 border border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-lg focus:ring-2 focus:ring-ekami-gold-500 dark:bg-ekami-charcoal-900 dark:text-white"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Specs */}
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
+                        Transmission
+                      </label>
+                      <select
+                        value={formData.transmission || 'automatic'}
+                        onChange={(e) => setFormData({ ...formData, transmission: e.target.value })}
+                        className="w-full px-4 py-2 border border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-lg focus:ring-2 focus:ring-ekami-gold-500 dark:bg-ekami-charcoal-900 dark:text-white"
+                      >
+                        <option value="automatic">Automatic</option>
+                        <option value="manual">Manual</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
+                        Fuel Type
+                      </label>
+                      <select
+                        value={formData.fuel_type || 'gasoline'}
+                        onChange={(e) => setFormData({ ...formData, fuel_type: e.target.value })}
+                        className="w-full px-4 py-2 border border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-lg focus:ring-2 focus:ring-ekami-gold-500 dark:bg-ekami-charcoal-900 dark:text-white"
+                      >
+                        <option value="gasoline">Gasoline</option>
+                        <option value="diesel">Diesel</option>
+                        <option value="electric">Electric</option>
+                        <option value="hybrid">Hybrid</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
+                        Seats
+                      </label>
+                      <input
+                        type="number"
+                        value={formData.seats || 5}
+                        onChange={(e) => setFormData({ ...formData, seats: parseInt(e.target.value) })}
+                        className="w-full px-4 py-2 border border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-lg focus:ring-2 focus:ring-ekami-gold-500 dark:bg-ekami-charcoal-900 dark:text-white"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Additional Details */}
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
+                        Mileage (km)
+                      </label>
+                      <input
+                        type="number"
+                        value={formData.mileage || 0}
+                        onChange={(e) => setFormData({ ...formData, mileage: parseInt(e.target.value) })}
+                        className="w-full px-4 py-2 border border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-lg focus:ring-2 focus:ring-ekami-gold-500 dark:bg-ekami-charcoal-900 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
+                        Color
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.color || ''}
+                        onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                        className="w-full px-4 py-2 border border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-lg focus:ring-2 focus:ring-ekami-gold-500 dark:bg-ekami-charcoal-900 dark:text-white"
+                        placeholder="Black"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
+                        Doors
+                      </label>
+                      <input
+                        type="number"
+                        value={formData.doors || 4}
+                        onChange={(e) => setFormData({ ...formData, doors: parseInt(e.target.value) })}
+                        className="w-full px-4 py-2 border border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-lg focus:ring-2 focus:ring-ekami-gold-500 dark:bg-ekami-charcoal-900 dark:text-white"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Location */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
+                        City
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.city || ''}
+                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                        className="w-full px-4 py-2 border border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-lg focus:ring-2 focus:ring-ekami-gold-500 dark:bg-ekami-charcoal-900 dark:text-white"
+                        placeholder="Douala"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
+                        Location
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.location || ''}
+                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                        className="w-full px-4 py-2 border border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-lg focus:ring-2 focus:ring-ekami-gold-500 dark:bg-ekami-charcoal-900 dark:text-white"
+                        placeholder="Akwa"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Images */}
+                  <div>
+                    <label className="block text-sm font-medium text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
+                      Car Images
+                    </label>
+                    
+                    {/* File Upload */}
+                    <div className="mb-4">
+                      <label className="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed border-ekami-silver-300 dark:border-ekami-charcoal-600 rounded-lg cursor-pointer hover:border-ekami-gold-500 transition-colors">
+                        <div className="text-center">
+                          <Plus className="w-8 h-8 mx-auto mb-2 text-ekami-charcoal-400" />
+                          <p className="text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400">
+                            {uploadingImages ? 'Uploading...' : 'Click to upload images or drag and drop'}
+                          </p>
+                          <p className="text-xs text-ekami-charcoal-500 dark:text-ekami-silver-500 mt-1">
+                            PNG, JPG, WEBP up to 10MB each
+                          </p>
+                        </div>
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/*"
+                          onChange={(e) => {
+                            if (e.target.files && e.target.files.length > 0) {
+                              handleImageUpload(e.target.files);
+                            }
+                          }}
+                          disabled={uploadingImages}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+
+                    {/* Image Preview */}
+                    {formData.images && formData.images.length > 0 && (
+                      <div className="grid grid-cols-4 gap-3 mb-4">
+                        {formData.images.map((url, index) => (
+                          <div key={index} className="relative group">
+                            <img
+                              src={url}
+                              alt={`Car ${index + 1}`}
+                              className="w-full h-24 object-cover rounded-lg"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setFormData({
+                                  ...formData,
+                                  images: formData.images?.filter((_, i) => i !== index)
+                                });
+                              }}
+                              className="absolute top-1 right-1 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Or add URL */}
+                    <details className="mt-3">
+                      <summary className="text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400 cursor-pointer hover:text-ekami-gold-600">
+                        Or add image URLs manually
+                      </summary>
+                      <textarea
+                        value={(formData.images || []).join('\n')}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          images: e.target.value.split('\n').filter(url => url.trim()) 
+                        })}
+                        rows={3}
+                        className="w-full mt-2 px-4 py-2 border border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-lg focus:ring-2 focus:ring-ekami-gold-500 dark:bg-ekami-charcoal-900 dark:text-white font-mono text-sm"
+                        placeholder="https://images.unsplash.com/photo-1.jpg"
+                      />
+                    </details>
+                  </div>
+
+                  {/* Availability */}
+                  <div className="flex items-center gap-6">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={formData.available_for_rent || false}
+                        onChange={(e) => setFormData({ ...formData, available_for_rent: e.target.checked })}
+                        className="rounded border-ekami-silver-300 text-ekami-gold-600 focus:ring-ekami-gold-500"
+                      />
+                      <span className="text-sm text-ekami-charcoal-700 dark:text-ekami-silver-300">
+                        Available for Rent
+                      </span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={formData.available_for_sale || false}
+                        onChange={(e) => setFormData({ ...formData, available_for_sale: e.target.checked })}
+                        className="rounded border-ekami-silver-300 text-ekami-gold-600 focus:ring-ekami-gold-500"
+                      />
+                      <span className="text-sm text-ekami-charcoal-700 dark:text-ekami-silver-300">
+                        Available for Sale
+                      </span>
+                    </label>
+                  </div>
+
+                  {/* Description */}
+                  <div>
+                    <label className="block text-sm font-medium text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
+                      Description
+                    </label>
+                    <textarea
+                      value={formData.description || ''}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      rows={4}
+                      className="w-full px-4 py-2 border border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-lg focus:ring-2 focus:ring-ekami-gold-500 dark:bg-ekami-charcoal-900 dark:text-white"
+                      placeholder="Describe the car..."
+                    />
+                  </div>
+
+                  {/* Buttons */}
+                  <div className="flex justify-end gap-3">
+                    <button
+                      type="button"
+                      onClick={resetForm}
+                      className="px-4 py-2 text-ekami-charcoal-700 dark:text-ekami-silver-300 hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-700 rounded-lg"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-ekami-gold-600 hover:bg-ekami-gold-700 text-white rounded-lg"
+                    >
+                      {selectedCar ? 'Update Car' : 'Add Car'}
+                    </button>
+                  </div>
+                </form>
               </div>
             </motion.div>
           </>

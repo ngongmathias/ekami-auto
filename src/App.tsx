@@ -18,6 +18,7 @@ import CarDetailPage from './pages/CarDetailPage';
 import BookingPage from './pages/BookingPage';
 import PaymentPage from './pages/PaymentPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
+import PurchasePage from './pages/PurchasePage';
 import ComparePage from './pages/ComparePage';
 import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
@@ -54,6 +55,7 @@ function App() {
                       <Route path="sign-up" element={<SignUpPage />} />
                       <Route path="rent" element={<RentPage />} />
                       <Route path="buy" element={<BuyPage />} />
+                      <Route path="purchase/:id" element={<PurchasePage />} />
                       <Route path="repairs" element={<RepairsPage />} />
                       <Route path="repairs/request" element={<ServiceRequestPage />} />
                       <Route path="sell" element={<SellCarPage />} />

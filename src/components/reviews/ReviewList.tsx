@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Star, Filter, TrendingUp, TrendingDown, Clock } from 'lucide-react';
+import { Star, Filter, TrendingUp, TrendingDown, Clock, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import ReviewCard from './ReviewCard';
 import StarRating from './StarRating';
+import ReviewForm from './ReviewForm';
 
 interface Review {
   id: string;
@@ -26,6 +29,8 @@ type SortOption = 'recent' | 'helpful' | 'rating-high' | 'rating-low';
 type FilterOption = 'all' | '5' | '4' | '3' | '2' | '1';
 
 export default function ReviewList({ carId }: ReviewListProps) {
+  const { isSignedIn } = useAuth();
+  const navigate = useNavigate();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<SortOption>('recent');
@@ -34,6 +39,8 @@ export default function ReviewList({ carId }: ReviewListProps) {
   const [ratingDistribution, setRatingDistribution] = useState<Record<number, number>>({
     5: 0, 4: 0, 3: 0, 2: 0, 1: 0
   });
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [hasCompletedBooking, setHasCompletedBooking] = useState(false);
 
   useEffect(() => {
     fetchReviews();
@@ -204,6 +211,17 @@ export default function ReviewList({ carId }: ReviewListProps) {
       {/* Controls */}
       {totalReviews > 0 && (
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          {/* Write Review Button */}
+          {isSignedIn && (
+            <button
+              onClick={() => setShowReviewForm(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-ekami-gold-600 hover:bg-ekami-gold-700 text-white font-semibold rounded-lg transition-colors"
+            >
+              <Plus className="w-5 h-5" />
+              Write a Review
+            </button>
+          )}
+
           {/* Filter by Rating */}
           <div className="flex items-center gap-2 flex-wrap">
             <Filter className="w-5 h-5 text-ekami-charcoal-600 dark:text-ekami-silver-400" />
@@ -251,9 +269,25 @@ export default function ReviewList({ carId }: ReviewListProps) {
           <h3 className="text-xl font-bold text-ekami-charcoal-900 dark:text-white mb-2">
             No reviews yet
           </h3>
-          <p className="text-ekami-charcoal-600 dark:text-ekami-silver-400">
+          <p className="text-ekami-charcoal-600 dark:text-ekami-silver-400 mb-6">
             Be the first to review this car!
           </p>
+          {isSignedIn ? (
+            <button
+              onClick={() => setShowReviewForm(true)}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-ekami-gold-600 hover:bg-ekami-gold-700 text-white font-semibold rounded-lg transition-colors"
+            >
+              <Plus className="w-5 h-5" />
+              Write a Review
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate('/sign-in')}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-ekami-gold-600 hover:bg-ekami-gold-700 text-white font-semibold rounded-lg transition-colors"
+            >
+              Sign in to Write a Review
+            </button>
+          )}
         </div>
       ) : (
         <div className="space-y-4">
@@ -266,6 +300,18 @@ export default function ReviewList({ carId }: ReviewListProps) {
           ))}
         </div>
       )}
+
+      {/* Review Form Modal */}
+      <ReviewForm
+        isOpen={showReviewForm}
+        onClose={() => {
+          setShowReviewForm(false);
+          fetchReviews();
+        }}
+        carId={carId}
+        bookingId="" // Can be empty for direct reviews
+        carName="" // Will be fetched in the form
+      />
     </div>
   );
 }

@@ -2,13 +2,17 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { Elements } from '@stripe/react-stripe-js';
 import { ArrowLeft, Home, ChevronRight, CreditCard, Smartphone } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 import { getStripe } from '../lib/stripe';
 import CheckoutForm from '../components/payment/CheckoutForm';
 import MoMoPayment from '../components/payment/MoMoPayment';
+import toast from 'react-hot-toast';
 
 type PaymentMethod = 'card' | 'momo';
 
 export default function PaymentPage() {
+  const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [stripePromise] = useState(() => getStripe());
@@ -24,6 +28,7 @@ export default function PaymentPage() {
   const startDate = searchParams.get('start_date') || '';
   const endDate = searchParams.get('end_date') || '';
   const pickupLocation = searchParams.get('pickup_location') || '';
+  const dropoffLocation = searchParams.get('dropoff_location') || pickupLocation;
 
   useEffect(() => {
     // Validate required params
@@ -32,20 +37,88 @@ export default function PaymentPage() {
     }
   }, [amount, carName, email, navigate]);
 
-  const handlePaymentSuccess = (paymentIntentId: string) => {
-    // Redirect to success page with booking details
-    const successParams = new URLSearchParams({
-      booking_id: 'BK' + Date.now(),
-      payment_intent: paymentIntentId,
-      amount: amount.toString(),
-      car_name: carName,
-      email,
-      start_date: startDate,
-      end_date: endDate,
-      pickup_location: pickupLocation,
-    });
+  const handlePaymentSuccess = async (paymentIntentId: string) => {
+    try {
+      // Create booking in database
+      const bookingReference = 'BK' + Date.now();
+      const customerName = user?.firstName && user?.lastName 
+        ? `${user.firstName} ${user.lastName}` 
+        : email;
 
-    navigate(`/payment/success?${successParams.toString()}`);
+      // Calculate required fields
+      const dailyRate = amount / (rentalDays || 1);
+      const subtotal = amount;
+
+      const { data, error } = await supabase
+        .from('bookings')
+        .insert({
+          user_id: user?.id || null,
+          car_id: carId,
+          start_date: startDate,
+          end_date: endDate,
+          pickup_location: pickupLocation,
+          dropoff_location: dropoffLocation,
+          daily_rate: dailyRate,
+          total_days: rentalDays || 1,
+          subtotal: subtotal,
+          tax: 0,
+          insurance: 0,
+          total_amount: amount,
+          status: 'confirmed',
+          payment_status: 'paid',
+          payment_method: paymentMethod === 'card' ? 'stripe' : 'mobile_money',
+          stripe_payment_intent_id: paymentIntentId,
+          booking_reference: bookingReference,
+          customer_name: customerName,
+          customer_email: email,
+          driver_name: customerName,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating booking:', error);
+        console.error('Error details:', JSON.stringify(error, null, 2));
+        console.error('Booking data being sent:', {
+          user_id: user?.id || null,
+          car_id: carId,
+          start_date: startDate,
+          end_date: endDate,
+          pickup_location: pickupLocation,
+          dropoff_location: dropoffLocation,
+          total_amount: amount,
+          status: 'confirmed',
+          payment_status: 'paid',
+          payment_method: paymentMethod === 'card' ? 'stripe' : 'mobile_money',
+          stripe_payment_intent_id: paymentIntentId,
+          booking_reference: bookingReference,
+          customer_name: customerName,
+          customer_email: email,
+        });
+        toast.error(`Booking creation failed: ${error.message}`);
+        return;
+      }
+
+      console.log('Booking created successfully:', data);
+
+      // Redirect to success page with booking details
+      const successParams = new URLSearchParams({
+        booking_id: data.id,
+        booking_reference: bookingReference,
+        payment_intent: paymentIntentId,
+        amount: amount.toString(),
+        car_name: carName,
+        email,
+        start_date: startDate,
+        end_date: endDate,
+        pickup_location: pickupLocation,
+      });
+
+      navigate(`/payment/success?${successParams.toString()}`);
+    } catch (error) {
+      console.error('Error in payment success handler:', error);
+      toast.error('Failed to complete booking');
+    }
   };
 
   const handlePaymentError = (error: string) => {

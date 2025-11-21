@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar, Phone, MessageCircle, ShoppingCart, CheckCircle, TrendingUp, Calculator } from 'lucide-react';
+import { Calendar, Phone, MessageCircle, ShoppingCart, CheckCircle, TrendingUp, Calculator, GitCompare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Car } from '../../lib/supabase';
 import PurchaseInquiryModal from './PurchaseInquiryModal';
@@ -110,13 +110,13 @@ export default function PriceCard({ car }: PriceCardProps) {
 
           {car.available_for_sale && car.price_sale && (
             <>
-              <button
-                onClick={() => setShowPurchaseModal(true)}
+              <Link
+                to={`/purchase/${car.slug || car.id}`}
                 className="btn-primary w-full flex items-center justify-center space-x-2"
               >
                 <ShoppingCart className="w-5 h-5" />
                 <span>Buy This Car</span>
-              </button>
+              </Link>
               
               <button
                 onClick={() => setShowOfferModal(true)}
@@ -135,6 +135,15 @@ export default function PriceCard({ car }: PriceCardProps) {
               </button>
             </>
           )}
+
+          {/* Compare Button */}
+          <Link
+            to={`/compare?cars=${car.id}`}
+            className="w-full flex items-center justify-center space-x-2 px-6 py-3 border-2 border-ekami-silver-300 dark:border-ekami-charcoal-600 text-ekami-charcoal-700 dark:text-ekami-silver-300 hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-700 rounded-xl font-semibold transition-all"
+          >
+            <GitCompare className="w-5 h-5" />
+            <span>Compare</span>
+          </Link>
 
           {/* WhatsApp Contact */}
           <a

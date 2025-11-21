@@ -1,25 +1,33 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Eye, Search } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { supabase } from '../../lib/supabase';
+import BlogPostEditor from './BlogPostEditor';
 
 interface BlogPost {
   id: string;
   title: string;
   slug: string;
   excerpt?: string;
+  content?: string;
   status: string;
   published_at?: string;
   created_at: string;
   author_name?: string;
   featured_image?: string;
+  category?: string;
+  tags?: string[];
+  meta_title?: string;
+  meta_description?: string;
 }
 
 export default function BlogManagement() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showEditor, setShowEditor] = useState(false);
+  const [editingPost, setEditingPost] = useState<BlogPost | undefined>(undefined);
 
   useEffect(() => {
     fetchPosts();
@@ -83,7 +91,13 @@ export default function BlogManagement() {
             Create and manage blog posts
           </p>
         </div>
-        <button className="flex items-center space-x-2 px-6 py-3 bg-ekami-gold-600 text-white rounded-xl font-semibold hover:bg-ekami-gold-700 transition-colors shadow-lg">
+        <button
+          onClick={() => {
+            setEditingPost(undefined);
+            setShowEditor(true);
+          }}
+          className="flex items-center space-x-2 px-6 py-3 bg-ekami-gold-600 text-white rounded-xl font-semibold hover:bg-ekami-gold-700 transition-colors shadow-lg"
+        >
           <Plus className="w-5 h-5" />
           <span>New Post</span>
         </button>
@@ -170,7 +184,13 @@ export default function BlogManagement() {
                     >
                       <Eye className="w-4 h-4 text-blue-600" />
                     </button>
-                    <button className="p-2 hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-700 rounded-lg transition-colors">
+                    <button
+                      onClick={() => {
+                        setEditingPost(post);
+                        setShowEditor(true);
+                      }}
+                      className="p-2 hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-700 rounded-lg transition-colors"
+                    >
                       <Edit className="w-4 h-4 text-ekami-gold-600" />
                     </button>
                     <button
@@ -186,6 +206,22 @@ export default function BlogManagement() {
           ))
         )}
       </div>
+
+      {/* Blog Post Editor Modal */}
+      <AnimatePresence>
+        {showEditor && (
+          <BlogPostEditor
+            post={editingPost}
+            onClose={() => {
+              setShowEditor(false);
+              setEditingPost(undefined);
+            }}
+            onSave={() => {
+              fetchPosts();
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

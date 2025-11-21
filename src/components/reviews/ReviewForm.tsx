@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X, Send, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
+import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import { supabase } from '../../lib/supabase';
 import StarRating from './StarRating';
@@ -21,6 +22,7 @@ interface ReviewFormData {
 }
 
 export default function ReviewForm({ isOpen, onClose, carId, carName, bookingId }: ReviewFormProps) {
+  const { user, isSignedIn } = useAuth();
   const [rating, setRating] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { register, handleSubmit, formState: { errors }, reset } = useForm<ReviewFormData>();
@@ -31,23 +33,17 @@ export default function ReviewForm({ isOpen, onClose, carId, carName, bookingId 
       return;
     }
 
+    if (!isSignedIn || !user) {
+      toast.error('You must be logged in to submit a review');
+      return;
+    }
+
     try {
       setIsSubmitting(true);
 
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast.error('You must be logged in to submit a review');
-        return;
-      }
-
-      // Get user profile for name
-      const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('full_name')
-        .eq('id', user.id)
-        .single();
+      const userName = user.firstName && user.lastName 
+        ? `${user.firstName} ${user.lastName}`
+        : user.primaryEmailAddress?.emailAddress || 'Anonymous';
 
       // Insert review
       const { error: reviewError } = await supabase.from('reviews').insert({
@@ -55,7 +51,6 @@ export default function ReviewForm({ isOpen, onClose, carId, carName, bookingId 
         car_id: carId,
         booking_id: bookingId || null,
         rating: rating,
-        title: data.title,
         comment: data.comment,
         status: 'pending', // Requires admin approval
       });
@@ -75,8 +70,7 @@ export default function ReviewForm({ isOpen, onClose, carId, carName, bookingId 
           <p><strong>Vehicle:</strong> ${carName}</p>
           <p><strong>Rating:</strong> ${'⭐'.repeat(rating)} (${rating}/5)</p>
           <hr />
-          <p><strong>Customer:</strong> ${profile?.full_name || user.email}</p>
-          <p><strong>Title:</strong> ${data.title}</p>
+          <p><strong>Customer:</strong> ${userName}</p>
           <p><strong>Review:</strong></p>
           <p>${data.comment}</p>
           <hr />
