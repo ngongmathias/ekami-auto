@@ -20,6 +20,7 @@
     "@mui/icons-material": "^7.3.4",
     "@mui/material": "^7.3.4",
     "@mui/x-data-grid": "^8.14.1",
+    "@react-google-maps/api": "^2.20.7",
     "@stripe/react-stripe-js": "^5.4.0",
     "@stripe/stripe-js": "^8.5.2",
     "@supabase/supabase-js": "^2.47.10",

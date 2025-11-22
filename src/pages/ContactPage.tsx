@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Mail, Phone, MapPin, Send, Clock, MessageSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import MapDisplay from '../components/maps/MapDisplay';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -129,14 +130,16 @@ export default function ContactPage() {
               href="https://wa.me/237652765281"
               target="_blank"
               rel="noopener noreferrer"
-              className="card hover:shadow-xl transition-all bg-gradient-to-br from-green-500 to-green-600 text-white group"
+              className="block p-6 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg hover:shadow-xl transition-all group cursor-pointer"
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-bold mb-2">Chat on WhatsApp</h3>
-                  <p className="text-sm text-green-100">Get instant responses</p>
+              <div className="flex items-start space-x-4">
+                <div className="p-3 bg-white/20 rounded-xl">
+                  <MessageSquare className="w-6 h-6 text-white" />
                 </div>
-                <MessageSquare className="w-8 h-8 group-hover:scale-110 transition-transform" />
+                <div>
+                  <h3 className="font-bold text-white mb-2">Chat on WhatsApp</h3>
+                  <p className="text-sm text-white/90">Get instant responses</p>
+                </div>
               </div>
             </a>
           </motion.div>
@@ -255,6 +258,42 @@ export default function ContactPage() {
                   )}
                 </button>
               </form>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Map Section */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-white dark:bg-ekami-charcoal-800 rounded-2xl shadow-xl p-8"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-3xl font-display font-bold text-ekami-charcoal-900 dark:text-white">
+                Find Us
+              </h2>
+              <a
+                href="https://www.google.com/maps/dir/?api=1&destination=4.0511,9.7679"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 bg-ekami-gold-600 hover:bg-ekami-gold-700 text-white rounded-lg font-medium transition-colors text-sm"
+              >
+                Get Directions
+              </a>
+            </div>
+            <MapDisplay
+              lat={4.0511}
+              lng={9.7679}
+              address="Bonapriso, Douala, Cameroon"
+              height="450px"
+              zoom={15}
+            />
+            <div className="mt-4 p-4 bg-ekami-silver-50 dark:bg-ekami-charcoal-700 rounded-lg">
+              <p className="text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400">
+                📍 Visit us at our showroom in Bonapriso, Douala. We're open Monday to Saturday, 9 AM - 6 PM.
+              </p>
             </div>
           </motion.div>
         </div>

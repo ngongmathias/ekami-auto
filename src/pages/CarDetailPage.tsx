@@ -19,6 +19,8 @@ import ImageGallery from '../components/cars/ImageGallery';
 import CarSpecs from '../components/cars/CarSpecs';
 import PriceCard from '../components/cars/PriceCard';
 import ReviewList from '../components/reviews/ReviewList';
+import SocialShare from '../components/common/SocialShare';
+import MapDisplay from '../components/maps/MapDisplay';
 
 export default function CarDetailPage() {
   const { t } = useTranslation();
@@ -203,66 +205,13 @@ export default function CarDetailPage() {
               <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
             </button>
 
-            <div className="relative">
-              <button
-                onClick={() => setShowShareMenu(!showShareMenu)}
-                className="p-3 bg-ekami-silver-100 dark:bg-ekami-charcoal-800 text-ekami-charcoal-600 dark:text-ekami-silver-400 rounded-xl hover:scale-110 transition-all"
-                aria-label="Share"
-              >
-                <Share2 className="w-5 h-5" />
-              </button>
-
-              {/* Share Menu */}
-              {showShareMenu && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="absolute right-0 mt-2 w-48 bg-white dark:bg-ekami-charcoal-800 rounded-xl shadow-xl border border-ekami-silver-200 dark:border-ekami-charcoal-700 py-2 z-10"
-                >
-                  <button
-                    onClick={() => handleShare('whatsapp')}
-                    className="w-full px-4 py-2 text-left hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-700 flex items-center space-x-3"
-                  >
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs">W</span>
-                    </div>
-                    <span>WhatsApp</span>
-                  </button>
-                  <button
-                    onClick={() => handleShare('facebook')}
-                    className="w-full px-4 py-2 text-left hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-700 flex items-center space-x-3"
-                  >
-                    <Facebook className="w-5 h-5 text-blue-600" />
-                    <span>Facebook</span>
-                  </button>
-                  <button
-                    onClick={() => handleShare('twitter')}
-                    className="w-full px-4 py-2 text-left hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-700 flex items-center space-x-3"
-                  >
-                    <Twitter className="w-5 h-5 text-blue-400" />
-                    <span>Twitter</span>
-                  </button>
-                  <button
-                    onClick={() => handleShare('email')}
-                    className="w-full px-4 py-2 text-left hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-700 flex items-center space-x-3"
-                  >
-                    <Mail className="w-5 h-5 text-gray-600" />
-                    <span>Email</span>
-                  </button>
-                  <button
-                    onClick={() => handleShare('copy')}
-                    className="w-full px-4 py-2 text-left hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-700 flex items-center space-x-3"
-                  >
-                    {copied ? (
-                      <Check className="w-5 h-5 text-green-600" />
-                    ) : (
-                      <Copy className="w-5 h-5 text-gray-600" />
-                    )}
-                    <span>{copied ? 'Copied!' : 'Copy Link'}</span>
-                  </button>
-                </motion.div>
-              )}
-            </div>
+            <SocialShare
+              url={`/car/${car.slug || car.id}`}
+              title={`${car.make} ${car.model} (${car.year})`}
+              description={`${car.description || ''} - Available for ${car.available_for_rent ? 'rent' : 'sale'} at Ekami Auto`}
+              imageUrl={car.images?.[0]}
+              hashtags={['EkamiAuto', 'CarRental', 'Cameroon']}
+            />
           </div>
         </div>
 
@@ -296,11 +245,42 @@ export default function CarDetailPage() {
           <ReviewList carId={car.id} />
         </div>
 
+        {/* Car Location */}
+        {car.location && (
+          <div className="mt-16">
+            <h2 className="text-3xl font-display font-bold text-ekami-charcoal-900 dark:text-white mb-6">
+              Pickup Location
+            </h2>
+            <div className="bg-white dark:bg-ekami-charcoal-800 rounded-2xl shadow-lg p-6">
+              <MapDisplay
+                lat={4.0511}
+                lng={9.7679}
+                address={car.location}
+                height="400px"
+                zoom={14}
+              />
+              <div className="mt-4 flex items-center justify-between flex-wrap gap-3">
+                <p className="text-ekami-charcoal-600 dark:text-ekami-silver-400">
+                  📍 <strong>Pickup Location:</strong> This is where you'll collect the vehicle.
+                </p>
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(car.location)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 bg-ekami-gold-600 hover:bg-ekami-gold-700 text-white rounded-lg font-medium transition-colors"
+                >
+                  Get Directions
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Similar Cars */}
         {similarCars.length > 0 && (
           <div className="mt-16">
             <h2 className="text-3xl font-display font-bold text-ekami-charcoal-900 dark:text-white mb-8">
-              Similar Cars
+              Similar Cars You Might Like
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {similarCars.map((similarCar) => (

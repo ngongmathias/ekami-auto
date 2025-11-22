@@ -10,10 +10,12 @@ Make sure you have all these set up:
 - [ ] `VITE_SUPABASE_ANON_KEY` - Supabase anonymous key
 - [ ] `VITE_STRIPE_PUBLISHABLE_KEY` - Stripe payments
 - [ ] `VITE_RESEND_API_KEY` - Email notifications
+- [ ] `VITE_GOOGLE_MAPS_API_KEY` - Google Maps integration
 - [ ] `VITE_WHATSAPP_NUMBER` - WhatsApp contact (237652765281)
 - [ ] `VITE_COMPANY_EMAIL` - info@ekamiauto.com
 - [ ] `VITE_MANAGER_EMAIL` - kerryngong@ekamiauto.com
 - [ ] `VITE_ADMIN_EMAILS` - Admin access emails
+- [ ] `VITE_GA4_MEASUREMENT_ID` - Google Analytics 4 (optional)
 
 ### ✅ **2. Database Setup**
 - [ ] All migrations run in Supabase

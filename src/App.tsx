@@ -7,6 +7,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { CurrencyProvider } from './contexts/CurrencyContext';
+import { GoogleMapsProvider } from './contexts/GoogleMapsContext';
 import theme from './lib/theme';
 import Layout from './components/common/Layout';
 import AnalyticsWrapper from './components/common/AnalyticsWrapper';
@@ -49,8 +50,9 @@ function App() {
           <AuthProvider>
             <ThemeProvider>
               <CurrencyProvider>
-                <Router>
-                  <AnalyticsWrapper>
+                <GoogleMapsProvider>
+                  <Router>
+                    <AnalyticsWrapper>
                     <div className="App">
                       <Routes>
                     <Route path="/" element={<Layout />}>
@@ -77,8 +79,9 @@ function App() {
                       </Routes>
                     </div>
                   </AnalyticsWrapper>
-                </Router>
-                <Toaster position="top-right" />
+                  </Router>
+                  <Toaster position="top-right" />
+                </GoogleMapsProvider>
               </CurrencyProvider>
             </ThemeProvider>
           </AuthProvider>

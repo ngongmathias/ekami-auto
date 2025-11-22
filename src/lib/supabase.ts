@@ -29,6 +29,7 @@ export interface Car {
   make: string;
   model: string;
   year: number;
+  car_number?: string;
   vin?: string;
   price_sale?: number;
   price_rent_daily?: number;

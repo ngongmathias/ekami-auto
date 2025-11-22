@@ -96,15 +96,24 @@ export default function HomePage() {
           >
             <div className="bg-gradient-to-br from-gray-50 to-white dark:from-ekami-charcoal-800 dark:to-ekami-charcoal-900 rounded-3xl shadow-2xl p-8 border-2 border-ekami-silver-300/50 dark:border-ekami-charcoal-700 backdrop-blur-sm">
               <div className="flex flex-wrap gap-4 mb-4">
-                <button className="px-8 py-3 bg-gradient-to-r from-ekami-charcoal-700 to-ekami-charcoal-800 text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all">
+                <Link
+                  to="/rent"
+                  className="px-8 py-3 bg-gradient-to-r from-ekami-charcoal-700 to-ekami-charcoal-800 text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
+                >
                   {t('search.rent')}
-                </button>
-                <button className="px-8 py-3 text-ekami-charcoal-700 dark:text-ekami-silver-300 bg-gray-200/50 dark:bg-ekami-charcoal-700/50 hover:bg-gray-300 dark:hover:bg-ekami-charcoal-600 rounded-2xl font-semibold transition-all transform hover:-translate-y-0.5">
+                </Link>
+                <Link
+                  to="/buy"
+                  className="px-8 py-3 text-ekami-charcoal-700 dark:text-ekami-silver-300 bg-gray-200/50 dark:bg-ekami-charcoal-700/50 hover:bg-gray-300 dark:hover:bg-ekami-charcoal-600 rounded-2xl font-semibold transition-all transform hover:-translate-y-0.5"
+                >
                   {t('search.buy')}
-                </button>
-                <button className="px-8 py-3 text-ekami-charcoal-700 dark:text-ekami-silver-300 bg-gray-200/50 dark:bg-ekami-charcoal-700/50 hover:bg-gray-300 dark:hover:bg-ekami-charcoal-600 rounded-2xl font-semibold transition-all transform hover:-translate-y-0.5">
+                </Link>
+                <Link
+                  to="/repairs"
+                  className="px-8 py-3 text-ekami-charcoal-700 dark:text-ekami-silver-300 bg-gray-200/50 dark:bg-ekami-charcoal-700/50 hover:bg-gray-300 dark:hover:bg-ekami-charcoal-600 rounded-2xl font-semibold transition-all transform hover:-translate-y-0.5"
+                >
                   {t('search.repair')}
-                </button>
+                </Link>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

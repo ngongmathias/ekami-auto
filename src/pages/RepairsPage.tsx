@@ -47,110 +47,41 @@ export default function RepairsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-ekami-silver-50 to-white dark:from-ekami-charcoal-900 dark:to-ekami-charcoal-800">
-      {/* Hero Section */}
-      <section className="relative py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-ekami-gold-500/10 to-transparent"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center max-w-3xl mx-auto"
-          >
-            <div className="inline-flex items-center space-x-2 bg-ekami-gold-100 dark:bg-ekami-gold-900/30 px-4 py-2 rounded-full mb-6">
-              <Wrench className="w-5 h-5 text-ekami-gold-600" />
-              <span className="text-sm font-semibold text-ekami-gold-700 dark:text-ekami-gold-400">
-                Professional Auto Repair Services
-              </span>
-            </div>
-            
-            <h1 className="text-5xl md:text-6xl font-display font-bold text-ekami-charcoal-900 dark:text-white mb-6">
-              Expert Care for Your
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-ekami-gold-500 to-ekami-gold-600">
-                Vehicle
-              </span>
-            </h1>
-            
-            <p className="text-xl text-ekami-charcoal-600 dark:text-ekami-silver-400 mb-8">
-              From routine maintenance to complex repairs, our certified mechanics ensure your vehicle runs at its best.
-            </p>
-
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => document.getElementById('packages')?.scrollIntoView({ behavior: 'smooth' })}
-              className="bg-gradient-to-r from-ekami-gold-500 to-ekami-gold-600 hover:from-ekami-gold-600 hover:to-ekami-gold-700 text-white font-semibold px-8 py-4 rounded-lg transition-all duration-300 inline-flex items-center space-x-2"
-            >
-              <span>View Service Packages</span>
-              <ArrowRight className="w-5 h-5" />
-            </motion.button>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Why Choose Us */}
-      <section className="py-16 bg-white dark:bg-ekami-charcoal-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {[
-              {
-                icon: Shield,
-                title: 'Certified Mechanics',
-                description: 'ASE-certified technicians with years of experience'
-              },
-              {
-                icon: Clock,
-                title: 'Fast Service',
-                description: 'Quick turnaround without compromising quality'
-              },
-              {
-                icon: CheckCircle,
-                title: 'Quality Parts',
-                description: 'Only genuine and high-quality replacement parts'
-              },
-              {
-                icon: Star,
-                title: 'Satisfaction Guaranteed',
-                description: 'Warranty on all repairs and services'
-              }
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="text-center"
-              >
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-ekami-gold-100 dark:bg-ekami-gold-900/30 rounded-full mb-4">
-                  <feature.icon className="w-8 h-8 text-ekami-gold-600" />
-                </div>
-                <h3 className="text-lg font-bold text-ekami-charcoal-900 dark:text-white mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400">
-                  {feature.description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Service Packages */}
-      <section id="packages" className="py-20">
+      <section id="packages" className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-12"
+            className="text-center mb-8"
           >
             <h2 className="text-4xl font-display font-bold text-ekami-charcoal-900 dark:text-white mb-4">
               Our Service Packages
             </h2>
-            <p className="text-lg text-ekami-charcoal-600 dark:text-ekami-silver-400 max-w-2xl mx-auto">
-              Choose from our comprehensive service packages or request a custom quote for your specific needs.
+            <p className="text-base text-ekami-charcoal-600 dark:text-ekami-silver-400 max-w-2xl mx-auto mb-6">
+              Professional maintenance and repairs by certified mechanics
             </p>
+
+            {/* Quick Features */}
+            <div className="flex flex-wrap justify-center gap-6 text-sm">
+              <div className="flex items-center gap-2 text-ekami-charcoal-700 dark:text-ekami-silver-300">
+                <Shield className="w-4 h-4 text-ekami-gold-600" />
+                <span>Certified Mechanics</span>
+              </div>
+              <div className="flex items-center gap-2 text-ekami-charcoal-700 dark:text-ekami-silver-300">
+                <Clock className="w-4 h-4 text-ekami-gold-600" />
+                <span>Fast Service</span>
+              </div>
+              <div className="flex items-center gap-2 text-ekami-charcoal-700 dark:text-ekami-silver-300">
+                <CheckCircle className="w-4 h-4 text-ekami-gold-600" />
+                <span>Quality Parts</span>
+              </div>
+              <div className="flex items-center gap-2 text-ekami-charcoal-700 dark:text-ekami-silver-300">
+                <Star className="w-4 h-4 text-ekami-gold-600" />
+                <span>Warranty Included</span>
+              </div>
+            </div>
           </motion.div>
 
           {/* Category Filter */}
@@ -263,6 +194,69 @@ export default function RepairsPage() {
                     {testimonial.service}
                   </p>
                 </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Us */}
+      <section className="py-16 bg-white dark:bg-ekami-charcoal-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl font-display font-bold text-ekami-charcoal-900 dark:text-white mb-4">
+              Why Choose Ekami Auto?
+            </h2>
+            <p className="text-lg text-ekami-charcoal-600 dark:text-ekami-silver-400">
+              Quality service you can trust
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {[
+              {
+                icon: Shield,
+                title: 'Certified Mechanics',
+                description: 'ASE-certified technicians with years of experience'
+              },
+              {
+                icon: Clock,
+                title: 'Fast Service',
+                description: 'Quick turnaround without compromising quality'
+              },
+              {
+                icon: CheckCircle,
+                title: 'Quality Parts',
+                description: 'Only genuine and high-quality replacement parts'
+              },
+              {
+                icon: Star,
+                title: 'Satisfaction Guaranteed',
+                description: 'Warranty on all repairs and services'
+              }
+            ].map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="text-center"
+              >
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-ekami-gold-100 dark:bg-ekami-gold-900/30 rounded-full mb-4">
+                  <feature.icon className="w-8 h-8 text-ekami-gold-600" />
+                </div>
+                <h3 className="text-lg font-bold text-ekami-charcoal-900 dark:text-white mb-2">
+                  {feature.title}
+                </h3>
+                <p className="text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400">
+                  {feature.description}
+                </p>
               </motion.div>
             ))}
           </div>

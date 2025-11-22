@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { User, Mail, Phone, MapPin, Shield, Navigation, Baby, Users, CreditCard, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import LocationPicker from '../maps/LocationPicker';
 
 interface BookingFormProps {
   onSubmit: (data: BookingFormData) => void;
@@ -43,6 +44,7 @@ export interface BookingFormData {
 }
 
 export default function BookingForm({ onSubmit, isSubmitting = false }: BookingFormProps) {
+  const [useMapPicker, setUseMapPicker] = useState(false);
   const [formData, setFormData] = useState<BookingFormData>({
     firstName: '',
     lastName: '',
@@ -294,21 +296,42 @@ export default function BookingForm({ onSubmit, isSubmitting = false }: BookingF
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-4">
+          {/* Pickup Location */}
           <div>
-            <label className="block text-sm font-semibold text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
-              Pickup Location
-            </label>
-            <select
-              value={formData.pickupLocation}
-              onChange={(e) => handleChange('pickupLocation', e.target.value)}
-              className="w-full px-4 py-3 bg-white dark:bg-ekami-charcoal-800 border-2 border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-xl focus:border-ekami-gold-400 focus:ring-4 focus:ring-ekami-gold-400/20 transition-all text-ekami-charcoal-900 dark:text-white"
-            >
-              {locations.map(loc => (
-                <option key={loc} value={loc}>{loc}</option>
-              ))}
-            </select>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-semibold text-ekami-charcoal-700 dark:text-ekami-silver-300">
+                Pickup Location
+              </label>
+              <button
+                type="button"
+                onClick={() => setUseMapPicker(!useMapPicker)}
+                className="text-sm text-ekami-gold-600 hover:text-ekami-gold-700 font-medium"
+              >
+                {useMapPicker ? '📍 Use Dropdown' : '🗺️ Use Map'}
+              </button>
+            </div>
+
+            {useMapPicker ? (
+              <LocationPicker
+                onLocationSelect={(location) => handleChange('pickupLocation', location.address)}
+                height="350px"
+              />
+            ) : (
+              <select
+                value={formData.pickupLocation}
+                onChange={(e) => handleChange('pickupLocation', e.target.value)}
+                className="w-full px-4 py-3 bg-white dark:bg-ekami-charcoal-800 border-2 border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-xl focus:border-ekami-gold-400 focus:ring-4 focus:ring-ekami-gold-400/20 transition-all text-ekami-charcoal-900 dark:text-white"
+              >
+                {locations.map(loc => (
+                  <option key={loc} value={loc}>{loc}</option>
+                ))}
+              </select>
+            )}
           </div>
+
+          {/* Time and Dropoff in grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
           <div>
             <label className="block text-sm font-semibold text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
@@ -353,6 +376,7 @@ export default function BookingForm({ onSubmit, isSubmitting = false }: BookingF
                 <option key={time} value={time}>{time}</option>
               ))}
             </select>
+          </div>
           </div>
         </div>
       </div>

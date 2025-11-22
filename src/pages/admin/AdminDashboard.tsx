@@ -18,6 +18,7 @@ import {
   Star,
   Upload,
   MessageSquare,
+  MapPin,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -32,8 +33,9 @@ import CommentsModeration from '../../components/admin/CommentsModeration';
 import RepairsManagement from '../../components/admin/RepairsManagement';
 import MechanicsManagement from '../../components/admin/MechanicsManagement';
 import ReviewsManagement from '../../components/admin/ReviewsManagement';
+import CarLocationManager from '../../components/admin/CarLocationManager';
 
-type TabType = 'overview' | 'cars' | 'bookings' | 'purchases' | 'sell-requests' | 'repairs' | 'mechanics' | 'reviews' | 'customers' | 'analytics' | 'blog' | 'comments';
+type TabType = 'overview' | 'cars' | 'bookings' | 'purchases' | 'sell-requests' | 'repairs' | 'mechanics' | 'reviews' | 'customers' | 'analytics' | 'blog' | 'comments' | 'locations';
 
 export default function AdminDashboard() {
   const { isSignedIn, isLoaded, user } = useAuth();
@@ -145,6 +147,7 @@ export default function AdminDashboard() {
   const tabs = [
     { id: 'overview' as TabType, label: 'Overview', icon: LayoutDashboard },
     { id: 'cars' as TabType, label: 'Cars', icon: Car },
+    { id: 'locations' as TabType, label: 'Locations', icon: MapPin },
     { id: 'bookings' as TabType, label: 'Bookings', icon: Calendar },
     { id: 'purchases' as TabType, label: 'Purchases', icon: DollarSign },
     { id: 'sell-requests' as TabType, label: 'Sell Requests', icon: Upload },
@@ -410,6 +413,8 @@ export default function AdminDashboard() {
           )}
 
           {activeTab === 'cars' && <CarManagement />}
+
+          {activeTab === 'locations' && <CarLocationManager />}
 
           {activeTab === 'bookings' && <BookingManagement />}
 
