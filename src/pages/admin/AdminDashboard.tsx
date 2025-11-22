@@ -19,6 +19,7 @@ import {
   Upload,
   MessageSquare,
   MapPin,
+  MessageCircle,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -34,8 +35,9 @@ import RepairsManagement from '../../components/admin/RepairsManagement';
 import MechanicsManagement from '../../components/admin/MechanicsManagement';
 import ReviewsManagement from '../../components/admin/ReviewsManagement';
 import CarLocationManager from '../../components/admin/CarLocationManager';
+import ChatLogs from '../../components/admin/ChatLogs';
 
-type TabType = 'overview' | 'cars' | 'bookings' | 'purchases' | 'sell-requests' | 'repairs' | 'mechanics' | 'reviews' | 'customers' | 'analytics' | 'blog' | 'comments' | 'locations';
+type TabType = 'overview' | 'cars' | 'bookings' | 'purchases' | 'sell-requests' | 'repairs' | 'mechanics' | 'reviews' | 'customers' | 'analytics' | 'blog' | 'comments' | 'locations' | 'chat-logs';
 
 export default function AdminDashboard() {
   const { isSignedIn, isLoaded, user } = useAuth();
@@ -157,6 +159,7 @@ export default function AdminDashboard() {
     { id: 'customers' as TabType, label: 'Customers', icon: Users },
     { id: 'blog' as TabType, label: 'Blog', icon: Package },
     { id: 'comments' as TabType, label: 'Comments', icon: MessageSquare },
+    { id: 'chat-logs' as TabType, label: 'Chat Logs', icon: MessageCircle },
     { id: 'analytics' as TabType, label: 'Analytics', icon: BarChart3 },
   ];
 
@@ -433,6 +436,8 @@ export default function AdminDashboard() {
           {activeTab === 'blog' && <BlogManagement />}
 
           {activeTab === 'comments' && <CommentsModeration />}
+
+          {activeTab === 'chat-logs' && <ChatLogs />}
 
           {activeTab === 'analytics' && (
             <div className="card text-center py-12">

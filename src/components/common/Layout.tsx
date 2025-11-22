@@ -2,7 +2,6 @@ import { Outlet } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
 import WhatsAppButton from './WhatsAppButton';
-import AIChatButton from './AIChatButton';
 
 export default function Layout() {
   return (
@@ -13,7 +12,6 @@ export default function Layout() {
       </main>
       <Footer />
       <WhatsAppButton />
-      <AIChatButton />
     </div>
   );
 }

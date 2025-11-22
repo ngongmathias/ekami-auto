@@ -138,6 +138,12 @@ export default function Header() {
                   {link.label}
                 </Link>
               ))}
+              
+              {/* Currency Selector in Mobile Menu */}
+              <div className="px-4 py-2">
+                <CurrencySelector />
+              </div>
+              
               {isSignedIn ? (
                 <>
                   <Link

@@ -21,6 +21,8 @@ import PriceCard from '../components/cars/PriceCard';
 import ReviewList from '../components/reviews/ReviewList';
 import SocialShare from '../components/common/SocialShare';
 import MapDisplay from '../components/maps/MapDisplay';
+import CarAvailabilityCalendar from '../components/calendar/CarAvailabilityCalendar';
+import '../components/calendar/calendar.css';
 
 export default function CarDetailPage() {
   const { t } = useTranslation();
@@ -243,6 +245,11 @@ export default function CarDetailPage() {
             </h2>
           </div>
           <ReviewList carId={car.id} />
+        </div>
+
+        {/* Availability Calendar */}
+        <div className="mt-16">
+          <CarAvailabilityCalendar carId={car.id} />
         </div>
 
         {/* Car Location */}

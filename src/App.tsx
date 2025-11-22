@@ -30,6 +30,7 @@ import SignInPage from './pages/SignInPage';
 import SignUpPage from './pages/SignUpPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ContactPage from './pages/ContactPage';
+import ChatWidget from './components/chat/ChatWidget';
 import './App.css';
 
 const queryClient = new QueryClient({
@@ -80,6 +81,7 @@ function App() {
                     </div>
                   </AnalyticsWrapper>
                   </Router>
+                  <ChatWidget />
                   <Toaster position="top-right" />
                 </GoogleMapsProvider>
               </CurrencyProvider>
