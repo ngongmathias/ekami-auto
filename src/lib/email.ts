@@ -46,6 +46,20 @@ export interface AdminNotificationEmail {
   customerEmail?: string;
 }
 
+export interface PriceAlertEmail {
+  to: string;
+  userName: string;
+  carMake: string;
+  carModel: string;
+  carYear: number;
+  oldPrice: number;
+  newPrice: number;
+  priceDrop: number;
+  percentageDrop: number;
+  carUrl: string;
+  unsubscribeUrl?: string;
+}
+
 /**
  * Send booking confirmation email to customer
  */
@@ -116,6 +130,53 @@ export async function sendAdminNotification(data: AdminNotificationEmail): Promi
     return true;
   } catch (error) {
     console.error('Failed to send admin notification:', error);
+    return false;
+  }
+}
+
+/**
+ * Send price drop alert email to user
+ */
+export async function sendPriceAlert(data: PriceAlertEmail): Promise<boolean> {
+  try {
+    // In production with Resend API:
+    // const RESEND_API_KEY = import.meta.env.VITE_RESEND_API_KEY;
+    // if (!RESEND_API_KEY) {
+    //   console.warn('Resend API key not configured');
+    //   return false;
+    // }
+    //
+    // const response = await fetch('https://api.resend.com/emails', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Authorization': `Bearer ${RESEND_API_KEY}`,
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({
+    //     from: 'Ekami Auto <alerts@resend.dev>', // or alerts@ekamiauto.com when DNS is ready
+    //     to: data.to,
+    //     subject: `🔔 Price Drop Alert: ${data.carMake} ${data.carModel}`,
+    //     html: generatePriceAlertHTML(data),
+    //   }),
+    // });
+    //
+    // if (!response.ok) {
+    //   throw new Error(`Resend API error: ${response.statusText}`);
+    // }
+
+    // For now, log to console (development mode)
+    console.log('📧 Price Alert Email:', {
+      to: data.to,
+      subject: `🔔 Price Drop Alert: ${data.carMake} ${data.carModel}`,
+      oldPrice: data.oldPrice,
+      newPrice: data.newPrice,
+      priceDrop: data.priceDrop,
+      percentageDrop: data.percentageDrop,
+    });
+
+    return true;
+  } catch (error) {
+    console.error('Failed to send price alert email:', error);
     return false;
   }
 }
@@ -283,8 +344,131 @@ function generatePaymentReceiptHTML(data: PaymentReceiptEmail): string {
   `;
 }
 
+/**
+ * Generate HTML for price alert email
+ */
+function generatePriceAlertHTML(data: PriceAlertEmail): string {
+  const savings = data.priceDrop.toLocaleString();
+  const percentOff = Math.round(data.percentageDrop);
+  
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Price Drop Alert</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; background: white; }
+    .header { background: linear-gradient(135deg, #D4AF37 0%, #C5A028 100%); color: white; padding: 40px 30px; text-align: center; }
+    .header h1 { margin: 0 0 10px 0; font-size: 32px; }
+    .header p { margin: 0; font-size: 16px; opacity: 0.95; }
+    .content { padding: 40px 30px; }
+    .alert-badge { background: #10B981; color: white; padding: 8px 16px; border-radius: 20px; display: inline-block; font-weight: bold; font-size: 14px; margin-bottom: 20px; }
+    .car-info { background: #f9f9f9; padding: 25px; border-radius: 12px; margin: 25px 0; border-left: 4px solid #D4AF37; }
+    .car-name { font-size: 24px; font-weight: bold; color: #1a1a1a; margin: 0 0 15px 0; }
+    .price-comparison { display: flex; justify-content: space-around; align-items: center; margin: 30px 0; padding: 25px; background: #f0fdf4; border-radius: 12px; }
+    .price-box { text-align: center; flex: 1; }
+    .price-label { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .old-price { font-size: 20px; color: #999; text-decoration: line-through; }
+    .new-price { font-size: 32px; font-weight: bold; color: #10B981; }
+    .arrow { font-size: 32px; color: #10B981; flex: 0 0 40px; }
+    .savings-box { background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; padding: 25px; border-radius: 12px; text-align: center; margin: 25px 0; }
+    .savings-amount { font-size: 36px; font-weight: bold; margin: 10px 0; }
+    .savings-label { font-size: 14px; opacity: 0.95; }
+    .cta-button { display: inline-block; background: #D4AF37; color: white; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin: 20px 0; transition: background 0.3s; }
+    .cta-button:hover { background: #C5A028; }
+    .features { margin: 25px 0; }
+    .feature { padding: 12px 0; border-bottom: 1px solid #eee; }
+    .feature:last-child { border-bottom: none; }
+    .footer { background: #f9f9f9; padding: 30px; text-align: center; color: #666; font-size: 13px; }
+    .footer a { color: #D4AF37; text-decoration: none; }
+    .unsubscribe { margin-top: 20px; font-size: 11px; color: #999; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>🔔 Price Drop Alert!</h1>
+      <p>The car you're watching just got cheaper</p>
+    </div>
+    
+    <!-- Content -->
+    <div class="content">
+      <div class="alert-badge">
+        ⚡ ${percentOff}% OFF - Limited Time
+      </div>
+      
+      <p>Hi ${data.userName},</p>
+      
+      <p>Great news! The price for the car you're interested in has dropped:</p>
+      
+      <!-- Car Info -->
+      <div class="car-info">
+        <h2 class="car-name">${data.carMake} ${data.carModel} (${data.carYear})</h2>
+      </div>
+      
+      <!-- Price Comparison -->
+      <div class="price-comparison">
+        <div class="price-box">
+          <div class="price-label">Was</div>
+          <div class="old-price">${data.oldPrice.toLocaleString()} XAF</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="price-box">
+          <div class="price-label">Now</div>
+          <div class="new-price">${data.newPrice.toLocaleString()} XAF</div>
+        </div>
+      </div>
+      
+      <!-- Savings -->
+      <div class="savings-box">
+        <div class="savings-label">YOU SAVE</div>
+        <div class="savings-amount">${savings} XAF</div>
+        <div class="savings-label">(${percentOff}% discount)</div>
+      </div>
+      
+      <p style="font-size: 16px; text-align: center; margin: 30px 0;">
+        <strong>Don't miss out!</strong> This price won't last forever.
+      </p>
+      
+      <!-- CTA Button -->
+      <center>
+        <a href="${data.carUrl}" class="cta-button">
+          🚗 View Car Details
+        </a>
+      </center>
+      
+      <div class="features">
+        <div class="feature">✅ Verified and inspected</div>
+        <div class="feature">✅ Flexible rental terms</div>
+        <div class="feature">✅ 24/7 customer support</div>
+        <div class="feature">✅ Free delivery in Douala</div>
+      </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+      <p><strong>Ekami Auto</strong> - Luxury Car Rental & Sales</p>
+      <p>📞 +237 6 52 76 52 81 | 📧 <a href="mailto:info@ekamiauto.com">info@ekamiauto.com</a></p>
+      <p>Douala, Cameroon</p>
+      
+      <div class="unsubscribe">
+        <p>You're receiving this because you subscribed to price alerts for this car.</p>
+        ${data.unsubscribeUrl ? `<p><a href="${data.unsubscribeUrl}">Unsubscribe from this alert</a></p>` : ''}
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
+
 // Export email templates for use in other modules
 export const emailTemplates = {
   bookingConfirmation: generateBookingConfirmationHTML,
   paymentReceipt: generatePaymentReceiptHTML,
+  priceAlert: generatePriceAlertHTML,
 };

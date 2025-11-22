@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { getAvailableCarsForRent, type Car as CarType } from '../lib/supabase';
 import toast from 'react-hot-toast';
+import DynamicSearchBox from '../components/home/DynamicSearchBox';
 
 export default function HomePage() {
   const { t } = useTranslation();
@@ -87,59 +88,14 @@ export default function HomePage() {
             </div>
           </motion.div>
 
-          {/* Search Card */}
+          {/* Dynamic Search Card */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mt-12 max-w-5xl mx-auto"
           >
-            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-ekami-charcoal-800 dark:to-ekami-charcoal-900 rounded-3xl shadow-2xl p-8 border-2 border-ekami-silver-300/50 dark:border-ekami-charcoal-700 backdrop-blur-sm">
-              <div className="flex flex-wrap gap-4 mb-4">
-                <Link
-                  to="/rent"
-                  className="px-8 py-3 bg-gradient-to-r from-ekami-charcoal-700 to-ekami-charcoal-800 text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
-                >
-                  {t('search.rent')}
-                </Link>
-                <Link
-                  to="/buy"
-                  className="px-8 py-3 text-ekami-charcoal-700 dark:text-ekami-silver-300 bg-gray-200/50 dark:bg-ekami-charcoal-700/50 hover:bg-gray-300 dark:hover:bg-ekami-charcoal-600 rounded-2xl font-semibold transition-all transform hover:-translate-y-0.5"
-                >
-                  {t('search.buy')}
-                </Link>
-                <Link
-                  to="/repairs"
-                  className="px-8 py-3 text-ekami-charcoal-700 dark:text-ekami-silver-300 bg-gray-200/50 dark:bg-ekami-charcoal-700/50 hover:bg-gray-300 dark:hover:bg-ekami-charcoal-600 rounded-2xl font-semibold transition-all transform hover:-translate-y-0.5"
-                >
-                  {t('search.repair')}
-                </Link>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <input
-                  type="text"
-                  placeholder={t('search.location')}
-                  className="form-input"
-                />
-                <input
-                  type="date"
-                  placeholder={t('search.date')}
-                  className="form-input"
-                />
-                <select className="form-input">
-                  <option>{t('search.category')}</option>
-                  <option>{t('categories.suv')}</option>
-                  <option>{t('categories.sedan')}</option>
-                  <option>{t('categories.pickup')}</option>
-                </select>
-              </div>
-              
-              <button className="w-full mt-4 btn-primary flex items-center justify-center space-x-2">
-                <Search className="w-5 h-5" />
-                <span>{t('search.search')}</span>
-              </button>
-            </div>
+            <DynamicSearchBox />
           </motion.div>
         </div>
       </section>

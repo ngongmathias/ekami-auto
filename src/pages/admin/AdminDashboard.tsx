@@ -18,6 +18,7 @@ import {
   Star,
   Upload,
   MessageSquare,
+  Bell,
   MapPin,
   MessageCircle,
 } from 'lucide-react';
@@ -36,8 +37,9 @@ import MechanicsManagement from '../../components/admin/MechanicsManagement';
 import ReviewsManagement from '../../components/admin/ReviewsManagement';
 import CarLocationManager from '../../components/admin/CarLocationManager';
 import ChatLogs from '../../components/admin/ChatLogs';
+import PriceAlertManagement from '../../components/admin/PriceAlertManagement';
 
-type TabType = 'overview' | 'cars' | 'bookings' | 'purchases' | 'sell-requests' | 'repairs' | 'mechanics' | 'reviews' | 'customers' | 'analytics' | 'blog' | 'comments' | 'locations' | 'chat-logs';
+type TabType = 'overview' | 'cars' | 'bookings' | 'purchases' | 'sell-requests' | 'repairs' | 'mechanics' | 'reviews' | 'customers' | 'analytics' | 'blog' | 'comments' | 'locations' | 'chat-logs' | 'price-alerts';
 
 export default function AdminDashboard() {
   const { isSignedIn, isLoaded, user } = useAuth();
@@ -160,6 +162,7 @@ export default function AdminDashboard() {
     { id: 'blog' as TabType, label: 'Blog', icon: Package },
     { id: 'comments' as TabType, label: 'Comments', icon: MessageSquare },
     { id: 'chat-logs' as TabType, label: 'Chat Logs', icon: MessageCircle },
+    { id: 'price-alerts' as TabType, label: 'Price Alerts', icon: Bell },
     { id: 'analytics' as TabType, label: 'Analytics', icon: BarChart3 },
   ];
 
@@ -438,6 +441,8 @@ export default function AdminDashboard() {
           {activeTab === 'comments' && <CommentsModeration />}
 
           {activeTab === 'chat-logs' && <ChatLogs />}
+
+          {activeTab === 'price-alerts' && <PriceAlertManagement />}
 
           {activeTab === 'analytics' && (
             <div className="card text-center py-12">

@@ -15,6 +15,7 @@ import toast from 'react-hot-toast';
 import { getAvailableCarsForRent, type Car } from '../lib/supabase';
 import FilterSidebar from '../components/cars/FilterSidebar';
 import CarGrid from '../components/cars/CarGrid';
+import { fuzzySearch, autoCorrect, getSearchSuggestions, COMMON_CAR_MAKES } from '../lib/fuzzySearch';
 
 type SortOption = 'price-asc' | 'price-desc' | 'year-desc' | 'year-asc' | 'name-asc';
 
@@ -24,6 +25,9 @@ export default function RentPage() {
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [correctedQuery, setCorrectedQuery] = useState('');
+  const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>('price-asc');
@@ -60,15 +64,30 @@ export default function RentPage() {
   const filteredAndSortedCars = useMemo(() => {
     let filtered = [...cars];
 
-    // Search filter
+    // Fuzzy search filter
     if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(car =>
-        car.make.toLowerCase().includes(query) ||
-        car.model.toLowerCase().includes(query) ||
-        car.body_type?.toLowerCase().includes(query) ||
-        car.year.toString().includes(query)
+      const corrected = autoCorrect(searchQuery);
+      if (corrected !== searchQuery.toLowerCase()) {
+        setCorrectedQuery(corrected);
+      } else {
+        setCorrectedQuery('');
+      }
+      
+      filtered = fuzzySearch(
+        filtered,
+        corrected,
+        (car) => [
+          car.make,
+          car.model,
+          `${car.make} ${car.model}`,
+          car.body_type || '',
+          car.year.toString(),
+          car.features?.join(' ') || '',
+        ],
+        0.6 // 60% similarity threshold
       );
+    } else {
+      setCorrectedQuery('');
     }
 
     // Price range filter
@@ -195,20 +214,85 @@ export default function RentPage() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-ekami-charcoal-400" />
             <input
               type="text"
-              placeholder="Search by make, model, or type..."
+              placeholder="Search by make, model, or type... (e.g., Toyota, SUV, 2023)"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setSearchQuery(value);
+                
+                // Generate suggestions
+                if (value.length >= 2) {
+                  const allSearchableTerms = [
+                    ...COMMON_CAR_MAKES,
+                    ...cars.map(car => car.make),
+                    ...cars.map(car => car.model),
+                    ...cars.map(car => `${car.make} ${car.model}`),
+                  ];
+                  const uniqueTerms = [...new Set(allSearchableTerms)];
+                  const suggestions = getSearchSuggestions(value, uniqueTerms, 5);
+                  setSearchSuggestions(suggestions);
+                  setShowSuggestions(suggestions.length > 0);
+                } else {
+                  setShowSuggestions(false);
+                }
+              }}
+              onFocus={() => {
+                if (searchQuery.length >= 2 && searchSuggestions.length > 0) {
+                  setShowSuggestions(true);
+                }
+              }}
+              onBlur={() => {
+                // Delay to allow clicking suggestions
+                setTimeout(() => setShowSuggestions(false), 200);
+              }}
               className="w-full pl-12 pr-4 py-4 bg-white dark:bg-ekami-charcoal-800 border-2 border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-2xl focus:border-ekami-gold-400 focus:ring-4 focus:ring-ekami-gold-400/20 transition-all text-ekami-charcoal-900 dark:text-white placeholder-ekami-charcoal-400"
             />
             {searchQuery && (
               <button
-                onClick={() => setSearchQuery('')}
+                onClick={() => {
+                  setSearchQuery('');
+                  setShowSuggestions(false);
+                }}
                 className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-700 rounded-full transition-colors"
               >
                 <X className="w-5 h-5 text-ekami-charcoal-400" />
               </button>
             )}
+            
+            {/* Search Suggestions Dropdown */}
+            <AnimatePresence>
+              {showSuggestions && searchSuggestions.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="absolute z-50 w-full mt-2 bg-white dark:bg-ekami-charcoal-800 border-2 border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-xl shadow-2xl overflow-hidden"
+                >
+                  {searchSuggestions.map((suggestion, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        setSearchQuery(suggestion);
+                        setShowSuggestions(false);
+                      }}
+                      className="w-full px-4 py-3 text-left hover:bg-ekami-gold-50 dark:hover:bg-ekami-charcoal-700 transition-colors text-ekami-charcoal-900 dark:text-white border-b border-ekami-silver-100 dark:border-ekami-charcoal-700 last:border-b-0"
+                    >
+                      <Search className="w-4 h-4 inline mr-2 text-ekami-charcoal-400" />
+                      {suggestion}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
+
+          {/* Autocorrect Message */}
+          {correctedQuery && (
+            <div className="flex items-center gap-2 text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400 bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-lg">
+              <span>Showing results for</span>
+              <span className="font-semibold text-blue-600 dark:text-blue-400">"{correctedQuery}"</span>
+            </div>
+          )}
 
           {/* Controls Row */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

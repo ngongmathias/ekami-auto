@@ -6,6 +6,7 @@ import {
   Home, 
   Share2, 
   Heart,
+  Bell,
   Facebook,
   Twitter,
   Mail,
@@ -23,6 +24,7 @@ import SocialShare from '../components/common/SocialShare';
 import MapDisplay from '../components/maps/MapDisplay';
 import CarAvailabilityCalendar from '../components/calendar/CarAvailabilityCalendar';
 import Car360Viewer from '../components/cars/Car360Viewer';
+import PriceAlertModal from '../components/alerts/PriceAlertModal';
 import '../components/calendar/calendar.css';
 
 export default function CarDetailPage() {
@@ -37,6 +39,7 @@ export default function CarDetailPage() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showPriceAlert, setShowPriceAlert] = useState(false);
 
   useEffect(() => {
     async function fetchCarData() {
@@ -196,6 +199,16 @@ export default function CarDetailPage() {
 
           {/* Action Buttons */}
           <div className="flex items-center space-x-3 mt-4 md:mt-0">
+            {/* Price Alert Button */}
+            <button
+              onClick={() => setShowPriceAlert(true)}
+              className="p-3 rounded-xl transition-all bg-ekami-gold-100 dark:bg-ekami-gold-900/30 text-ekami-gold-600 hover:scale-110"
+              aria-label="Set price alert"
+              title="Get notified when price drops"
+            >
+              <Bell className="w-5 h-5" />
+            </button>
+
             <button
               onClick={toggleFavorite}
               className={`p-3 rounded-xl transition-all ${
@@ -333,6 +346,14 @@ export default function CarDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Price Alert Modal */}
+      {showPriceAlert && (
+        <PriceAlertModal
+          car={car}
+          onClose={() => setShowPriceAlert(false)}
+        />
+      )}
     </div>
   );
 }
