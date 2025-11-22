@@ -50,6 +50,7 @@ export interface Car {
   location?: string;
   city?: string;
   images?: string[];
+  images_360?: string[];
   video_url?: string;
   description?: string;
   condition?: string;

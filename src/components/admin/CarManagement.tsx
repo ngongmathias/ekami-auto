@@ -21,12 +21,14 @@ export default function CarManagement() {
     available_for_rent: true,
     available_for_sale: false,
     images: [],
+    images_360: [],
     features: [],
     body_type: 'sedan',
     status: 'available',
     is_verified: true,
   });
   const [uploadingImages, setUploadingImages] = useState(false);
+  const [uploading360Images, setUploading360Images] = useState(false);
 
   const resetForm = () => {
     setFormData({
@@ -38,6 +40,7 @@ export default function CarManagement() {
       available_for_rent: true,
       available_for_sale: false,
       images: [],
+      images_360: [],
       features: [],
       body_type: 'sedan',
       status: 'available',
@@ -130,6 +133,51 @@ export default function CarManagement() {
       toast.error('Failed to upload images');
     } finally {
       setUploadingImages(false);
+    }
+  };
+
+  const handle360ImageUpload = async (files: FileList) => {
+    try {
+      setUploading360Images(true);
+      const uploadedUrls: string[] = [];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `360-${Date.now()}-${i}.${fileExt}`;
+        const filePath = `car-360/${fileName}`;
+
+        // Upload to Supabase Storage
+        const { error: uploadError } = await supabase.storage
+          .from('cars')
+          .upload(filePath, file);
+
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          toast.error(`Failed to upload ${file.name}`);
+          continue;
+        }
+
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('cars')
+          .getPublicUrl(filePath);
+
+        uploadedUrls.push(publicUrl);
+      }
+
+      // Add uploaded URLs to existing 360 images
+      setFormData({
+        ...formData,
+        images_360: [...(formData.images_360 || []), ...uploadedUrls]
+      });
+
+      toast.success(`${uploadedUrls.length} 360° image(s) uploaded successfully`);
+    } catch (error) {
+      console.error('Error uploading 360 images:', error);
+      toast.error('Failed to upload 360° images');
+    } finally {
+      setUploading360Images(false);
     }
   };
 
@@ -255,6 +303,9 @@ export default function CarManagement() {
                           <p className="text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400">
                             {car.year}
                           </p>
+                          <p className="text-xs font-semibold text-ekami-gold-600 dark:text-ekami-gold-400 mt-1">
+                            {car.car_number || 'No code'}
+                          </p>
                         </div>
                       </div>
                     </td>
@@ -350,9 +401,21 @@ export default function CarManagement() {
             >
               <div className="card max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-2xl font-bold text-ekami-charcoal-900 dark:text-white">
-                    {selectedCar ? 'Edit Car' : 'Add New Car'}
-                  </h3>
+                  <div>
+                    <h3 className="text-2xl font-bold text-ekami-charcoal-900 dark:text-white">
+                      {selectedCar ? 'Edit Car' : 'Add New Car'}
+                    </h3>
+                    {selectedCar && (
+                      <div className="mt-2 space-y-1">
+                        <p className="text-sm font-semibold text-ekami-gold-600 dark:text-ekami-gold-400">
+                          Car Code: {selectedCar.car_number || 'Not assigned'}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+                          ID: {selectedCar.id}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                   <button
                     onClick={resetForm}
                     className="p-2 hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-700 rounded-lg"
@@ -373,13 +436,21 @@ export default function CarManagement() {
                       if (error) throw error;
                       toast.success('Car updated successfully');
                     } else {
-                      // Add new car
+                      // Add new car - auto-generate car_number
+                      // Get the count of existing cars to generate next number
+                      const { count } = await supabase
+                        .from('cars')
+                        .select('*', { count: 'exact', head: true });
+                      
+                      const nextNumber = (count || 0) + 1;
+                      const carNumber = `EK-${String(nextNumber).padStart(3, '0')}`;
+                      
                       const { error } = await supabase
                         .from('cars')
-                        .insert(formData);
+                        .insert({ ...formData, car_number: carNumber });
                       
                       if (error) throw error;
-                      toast.success('Car added successfully');
+                      toast.success(`Car added successfully! Code: ${carNumber}`);
                     }
                     
                     resetForm();
@@ -659,6 +730,86 @@ export default function CarManagement() {
                         placeholder="https://images.unsplash.com/photo-1.jpg"
                       />
                     </details>
+                  </div>
+
+                  {/* 360° Images */}
+                  <div>
+                    <label className="block text-sm font-medium text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
+                      🔄 360° View Images (Optional)
+                    </label>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                      Upload 6-36 images taken around the car. Select multiple files in order!
+                    </p>
+                    
+                    {/* Upload Button */}
+                    <div className="border-2 border-dashed border-ekami-silver-300 dark:border-ekami-charcoal-700 rounded-lg p-6 text-center hover:border-ekami-gold-500 transition-colors cursor-pointer">
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files.length > 0) {
+                            handle360ImageUpload(e.target.files);
+                          }
+                        }}
+                        disabled={uploading360Images}
+                        className="hidden"
+                        id="360-image-upload"
+                      />
+                      <label htmlFor="360-image-upload" className="cursor-pointer">
+                        <div className="text-center">
+                          <Plus className="w-8 h-8 mx-auto mb-2 text-ekami-charcoal-400" />
+                          <p className="text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400">
+                            {uploading360Images ? 'Uploading 360° images...' : 'Click to upload 360° images'}
+                          </p>
+                          <p className="text-xs text-ekami-charcoal-500 dark:text-ekami-silver-500 mt-1">
+                            Select 6-36 images in rotation order
+                          </p>
+                        </div>
+                      </label>
+                    </div>
+
+                    {/* 360 Image Preview */}
+                    {formData.images_360 && formData.images_360.length > 0 && (
+                      <div className="mt-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-xs font-semibold text-ekami-gold-600 dark:text-ekami-gold-400">
+                            ✓ {formData.images_360.length} images for 360° view
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => setFormData({ ...formData, images_360: [] })}
+                            className="text-xs text-red-600 hover:text-red-700"
+                          >
+                            Clear all
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-6 gap-2">
+                          {formData.images_360.map((url, index) => (
+                            <div key={index} className="relative group">
+                              <img
+                                src={url}
+                                alt={`360° view ${index + 1}`}
+                                className="w-full h-16 object-cover rounded border border-gray-200 dark:border-gray-700"
+                              />
+                              <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded flex items-center justify-center">
+                                <span className="text-white text-xs font-bold">#{index + 1}</span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newImages = formData.images_360?.filter((_, i) => i !== index);
+                                  setFormData({ ...formData, images_360: newImages });
+                                }}
+                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Availability */}

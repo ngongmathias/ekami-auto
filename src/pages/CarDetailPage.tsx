@@ -22,6 +22,7 @@ import ReviewList from '../components/reviews/ReviewList';
 import SocialShare from '../components/common/SocialShare';
 import MapDisplay from '../components/maps/MapDisplay';
 import CarAvailabilityCalendar from '../components/calendar/CarAvailabilityCalendar';
+import Car360Viewer from '../components/cars/Car360Viewer';
 import '../components/calendar/calendar.css';
 
 export default function CarDetailPage() {
@@ -226,6 +227,19 @@ export default function CarDetailPage() {
               images={car.images || []} 
               carName={`${car.make} ${car.model}`} 
             />
+
+            {/* 360° View */}
+            {car.images_360 && car.images_360.length > 0 && (
+              <div>
+                <h2 className="text-2xl font-display font-bold text-ekami-charcoal-900 dark:text-white mb-4">
+                  🔄 360° View
+                </h2>
+                <Car360Viewer 
+                  images={car.images_360} 
+                  carName={`${car.make} ${car.model}`}
+                />
+              </div>
+            )}
 
             {/* Specifications */}
             <CarSpecs car={car} />
