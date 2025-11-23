@@ -80,21 +80,31 @@ export default function LoyaltyDashboard() {
     try {
       setLoading(true);
 
+      console.log('Fetching loyalty data for user:', user?.id);
+
       // Fetch or create member profile
-      let { data: memberData } = await supabase
+      const { data: memberData, error: fetchError } = await supabase
         .from('loyalty_members')
         .select('*')
         .eq('user_id', user?.id)
         .single();
 
-      if (!memberData) {
-        // Create new member
+      console.log('Fetch result:', { memberData, fetchError });
+
+      let currentMember = memberData;
+
+      if (!memberData && fetchError?.code === 'PGRST116') {
+        // No member found, create new one
+        console.log('Creating new loyalty member...');
+        
         const userEmail = user?.emailAddresses?.[0]?.emailAddress || 
                          user?.primaryEmailAddress?.emailAddress || 
                          user?.email || 
                          'no-email@example.com';
         
-        const { data: newMember } = await supabase
+        console.log('User email:', userEmail);
+        
+        const { data: newMember, error: insertError } = await supabase
           .from('loyalty_members')
           .insert([{
             user_id: user?.id,
@@ -106,8 +116,17 @@ export default function LoyaltyDashboard() {
           .select()
           .single();
 
+        if (insertError) {
+          console.error('Error creating member:', insertError);
+          toast.error('Failed to create loyalty account: ' + insertError.message);
+          setLoading(false);
+          return;
+        }
+
+        console.log('New member created:', newMember);
+
         // Add welcome transaction
-        await supabase.from('loyalty_transactions').insert([{
+        const { error: transactionError } = await supabase.from('loyalty_transactions').insert([{
           member_id: newMember.id,
           type: 'earn',
           source: 'bonus',
@@ -116,17 +135,34 @@ export default function LoyaltyDashboard() {
           balance_after: 100,
         }]);
 
-        memberData = newMember;
-        toast.success('Welcome! You earned 100 bonus points!');
-      }
+        if (transactionError) {
+          console.error('Error creating welcome transaction:', transactionError);
+        }
 
-      setMember(memberData);
+        currentMember = newMember;
+        setMember(newMember);
+        toast.success('Welcome! You earned 100 bonus points!');
+      } else if (memberData) {
+        console.log('Existing member found:', memberData);
+        setMember(memberData);
+      } else {
+        console.error('Unexpected error:', fetchError);
+        toast.error('Failed to load loyalty data: ' + fetchError?.message);
+        setLoading(false);
+        return;
+      }
+      
+      if (!currentMember) {
+        console.error('No member data available');
+        setLoading(false);
+        return;
+      }
 
       // Fetch transactions
       const { data: transactionsData } = await supabase
         .from('loyalty_transactions')
         .select('*')
-        .eq('member_id', memberData.id)
+        .eq('member_id', currentMember.id)
         .order('created_at', { ascending: false })
         .limit(20);
 
@@ -150,6 +186,7 @@ export default function LoyaltyDashboard() {
       setTiers(tiersData || []);
     } catch (error) {
       console.error('Error fetching loyalty data:', error);
+      toast.error('An error occurred. Please check the console for details.');
     } finally {
       setLoading(false);
     }
