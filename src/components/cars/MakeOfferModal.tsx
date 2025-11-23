@@ -272,12 +272,11 @@ export default function MakeOfferModal({
                 <div>
                   <label className="block text-sm font-semibold text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
                     <Mail className="w-4 h-4 inline mr-2" />
-                    Email Address *
+                    Email Address (Optional)
                   </label>
                   <input
                     type="email"
                     {...register('email', {
-                      required: 'Email is required',
                       pattern: {
                         value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                         message: 'Invalid email address',
