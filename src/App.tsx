@@ -11,6 +11,8 @@ import { GoogleMapsProvider } from './contexts/GoogleMapsContext';
 import theme from './lib/theme';
 import Layout from './components/common/Layout';
 import AnalyticsWrapper from './components/common/AnalyticsWrapper';
+import InstallPrompt from './components/pwa/InstallPrompt';
+import UpdatePrompt from './components/pwa/UpdatePrompt';
 import HomePage from './pages/HomePage';
 import RentPage from './pages/RentPage';
 import BuyPage from './pages/BuyPage';
@@ -30,6 +32,7 @@ import SignInPage from './pages/SignInPage';
 import SignUpPage from './pages/SignUpPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ContactPage from './pages/ContactPage';
+import CarToolsPage from './pages/CarToolsPage';
 import ChatWidget from './components/chat/ChatWidget';
 import './App.css';
 
@@ -76,6 +79,7 @@ function App() {
                       <Route path="account/*" element={<AccountPage />} />
                       <Route path="admin" element={<AdminDashboard />} />
                       <Route path="contact" element={<ContactPage />} />
+                      <Route path="tools" element={<CarToolsPage />} />
                     </Route>
                       </Routes>
                     </div>
@@ -88,6 +92,8 @@ function App() {
             </ThemeProvider>
           </AuthProvider>
         </LanguageProvider>
+        <InstallPrompt />
+        <UpdatePrompt />
       </MuiThemeProvider>
     </QueryClientProvider>
   );
