@@ -17,6 +17,7 @@ import {
 } from '../components/repairs/ServiceRequestSteps';
 import type { ServicePackage } from '../types/repairs';
 import toast from 'react-hot-toast';
+import { sendServiceRequestNotification } from '../lib/whatsappNotifications';
 
 interface FormData {
   // Service Selection
@@ -227,6 +228,23 @@ export default function ServiceRequestPage() {
         throw new Error('No data returned from database');
       }
 
+      // Send WhatsApp notification to admin
+      try {
+        await sendServiceRequestNotification({
+          name: formData.customerName,
+          email: formData.customerEmail,
+          phone: formData.customerPhone,
+          serviceType: formData.customService || 'Service Request',
+          carMake: formData.vehicleMake,
+          carModel: formData.vehicleModel,
+          description: formData.problemDescription || 'No description provided',
+        });
+        console.log('✅ WhatsApp notification sent to admin');
+      } catch (whatsappError) {
+        console.error('⚠️  WhatsApp notification failed:', whatsappError);
+        // Don't block request if notification fails
+      }
+
       // Send email notification
       try {
         console.log('Attempting to send email notification...');
@@ -234,7 +252,6 @@ export default function ServiceRequestPage() {
         console.log('Email sent successfully!');
       } catch (emailError) {
         console.error('Email error (non-critical):', emailError);
-        toast.error('Note: Email notification failed to send');
         // Don't fail the whole request if email fails
       }
 

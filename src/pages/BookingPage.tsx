@@ -8,6 +8,7 @@ import DateRangePicker from '../components/booking/DateRangePicker';
 import PriceCalculator from '../components/booking/PriceCalculator';
 import BookingForm, { type BookingFormData } from '../components/booking/BookingForm';
 import CancellationPolicy from '../components/common/CancellationPolicy';
+import { sendBookingNotification } from '../lib/whatsappNotifications';
 
 export default function BookingPage() {
   const { id } = useParams<{ id: string }>();
@@ -108,6 +109,25 @@ export default function BookingPage() {
       const subtotal = basePrice + extrasTotal;
       const tax = subtotal * 0.0775;
       const totalAmount = Math.round(subtotal + tax);
+
+      // Send WhatsApp notification to admin
+      try {
+        await sendBookingNotification({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          carName: `${car.make} ${car.model} ${car.year}`,
+          startDate: startDate.toLocaleDateString(),
+          endDate: endDate.toLocaleDateString(),
+          phone: formData.phone,
+          whatsapp: formData.whatsapp,
+          totalAmount: totalAmount,
+          pickupLocation: formData.pickupLocation,
+        });
+        console.log('✅ WhatsApp notification sent to admin');
+      } catch (notifError) {
+        console.error('⚠️  WhatsApp notification failed:', notifError);
+        // Don't block booking if notification fails
+      }
 
       // Prepare payment page params
       const paymentParams = new URLSearchParams({

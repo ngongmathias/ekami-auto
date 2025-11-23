@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Send, Mic, MicOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { sendChatMessage, type ChatMessage } from '../../lib/openai';
+import toast from 'react-hot-toast';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -13,6 +16,7 @@ interface AIChatProps {
 
 export default function AIChat({ onClose }: AIChatProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
@@ -40,15 +44,65 @@ export default function AIChat({ onClose }: AIChatProps) {
     setInput('');
     setIsLoading(true);
 
-    // TODO: Replace with actual OpenAI API call
-    setTimeout(() => {
-      const aiResponse: Message = {
-        role: 'assistant',
-        content: `I understand you're looking for: "${input}". Let me help you find the perfect car!`,
-      };
-      setMessages((prev) => [...prev, aiResponse]);
+    try {
+      // Send to OpenAI API
+      const response = await sendChatMessage([...messages, userMessage] as ChatMessage[]);
+      
+      // Check if response contains search command
+      const searchMatch = response.match(/\[SEARCH:(.*?)\]/);
+      
+      if (searchMatch) {
+        const searchQuery = searchMatch[1];
+        
+        // Remove the [SEARCH:] command from display
+        const displayResponse = response.replace(/\[SEARCH:.*?\]/, '').trim();
+        
+        const aiResponse: Message = {
+          role: 'assistant',
+          content: displayResponse,
+        };
+        setMessages((prev) => [...prev, aiResponse]);
+        
+        // Wait a moment for user to see the message, then redirect
+        setTimeout(() => {
+          // Parse search parameters and build URL
+          let searchUrl = '/rent';
+          
+          if (searchQuery !== 'all') {
+            const params = new URLSearchParams();
+            
+            // Parse the search query
+            const queryParts = searchQuery.split('&');
+            queryParts.forEach(part => {
+              const [key, value] = part.split('=');
+              if (key && value) {
+                params.append(key, value);
+              }
+            });
+            
+            searchUrl += `?${params.toString()}`;
+          }
+          
+          // Close chat and navigate
+          onClose();
+          navigate(searchUrl);
+          toast.success('Showing you matching cars!');
+        }, 1500);
+      } else {
+        // Normal response without search
+        const aiResponse: Message = {
+          role: 'assistant',
+          content: response,
+        };
+        setMessages((prev) => [...prev, aiResponse]);
+      }
+      
       setIsLoading(false);
-    }, 1000);
+    } catch (error) {
+      console.error('AI error:', error);
+      toast.error('Sorry, I encountered an error. Please try again.');
+      setIsLoading(false);
+    }
   };
 
   const handleVoiceInput = () => {

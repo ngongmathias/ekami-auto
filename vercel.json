@@ -3,6 +3,17 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/blog/:slug",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(bot|crawler|spider|facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegram).*"
+        }
+      ],
+      "destination": "/blog-static/:slug.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

@@ -89,17 +89,22 @@ export default function BlogPostPage() {
   const handleShare = (platform: string) => {
     const url = window.location.href;
     const title = post?.title || '';
+    const excerpt = post?.excerpt || '';
     
     let shareUrl = '';
     switch (platform) {
       case 'whatsapp':
-        shareUrl = `https://wa.me/?text=${encodeURIComponent(title + ' - ' + url)}`;
+        // Include title, excerpt, and URL for richer sharing
+        const whatsappText = `*${title}*\n\n${excerpt}\n\n🔗 ${url}`;
+        shareUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`;
         break;
       case 'facebook':
         shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
         break;
       case 'twitter':
-        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`;
+        // Twitter has character limit, so keep it shorter
+        const twitterText = excerpt.length > 200 ? excerpt.substring(0, 200) + '...' : excerpt;
+        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title + '\n\n' + twitterText)}`;
         break;
       case 'linkedin':
         shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
