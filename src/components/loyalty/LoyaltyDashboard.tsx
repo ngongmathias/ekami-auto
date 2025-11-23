@@ -60,7 +60,7 @@ interface Tier {
 }
 
 export default function LoyaltyDashboard() {
-  const { user } = useAuth();
+  const { user, isSignedIn, isLoaded } = useAuth();
   const [member, setMember] = useState<LoyaltyMember | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [rewards, setRewards] = useState<Reward[]>([]);
@@ -69,10 +69,12 @@ export default function LoyaltyDashboard() {
   const [activeTab, setActiveTab] = useState<'overview' | 'rewards' | 'history'>('overview');
 
   useEffect(() => {
-    if (user) {
+    if (isLoaded && isSignedIn && user) {
       fetchLoyaltyData();
+    } else if (isLoaded && !isSignedIn) {
+      setLoading(false);
     }
-  }, [user]);
+  }, [user, isSignedIn, isLoaded]);
 
   const fetchLoyaltyData = async () => {
     try {
@@ -87,11 +89,16 @@ export default function LoyaltyDashboard() {
 
       if (!memberData) {
         // Create new member
+        const userEmail = user?.emailAddresses?.[0]?.emailAddress || 
+                         user?.primaryEmailAddress?.emailAddress || 
+                         user?.email || 
+                         'no-email@example.com';
+        
         const { data: newMember } = await supabase
           .from('loyalty_members')
           .insert([{
             user_id: user?.id,
-            email: user?.email,
+            email: userEmail,
             total_points: 100, // Welcome bonus
             available_points: 100,
             lifetime_points: 100,
@@ -247,12 +254,59 @@ export default function LoyaltyDashboard() {
     );
   }
 
+  if (!isSignedIn) {
+    return (
+      <div className="max-w-2xl mx-auto text-center py-16 px-4">
+        <div className="bg-gradient-to-br from-ekami-gold-500 to-ekami-gold-600 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Award className="w-12 h-12 text-white" />
+        </div>
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+          Join Our Loyalty Program
+        </h2>
+        <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+          Sign in to start earning points, unlock exclusive rewards, and enjoy special benefits with every booking!
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href="/sign-in"
+            className="px-8 py-3 bg-gradient-to-r from-ekami-gold-500 to-ekami-gold-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+          >
+            Sign In
+          </a>
+          <a
+            href="/sign-up"
+            className="px-8 py-3 border-2 border-ekami-gold-500 text-ekami-gold-600 dark:text-ekami-gold-400 rounded-xl font-semibold hover:bg-ekami-gold-50 dark:hover:bg-ekami-gold-900/20 transition-all"
+          >
+            Create Account
+          </a>
+        </div>
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+          <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+            <Sparkles className="w-8 h-8 text-ekami-gold-500 mb-2" />
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Earn Points</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Get points on every booking and purchase</p>
+          </div>
+          <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+            <Gift className="w-8 h-8 text-ekami-gold-500 mb-2" />
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Unlock Rewards</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Redeem points for discounts and perks</p>
+          </div>
+          <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+            <TrendingUp className="w-8 h-8 text-ekami-gold-500 mb-2" />
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Level Up</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Progress through tiers for better benefits</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
   if (!member) {
     return (
       <div className="text-center py-12">
-        <Award className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-        <p className="text-gray-600 dark:text-gray-400">
-          Sign in to access your loyalty rewards
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ekami-gold-500 mx-auto"></div>
+        <p className="mt-4 text-gray-600 dark:text-gray-400">
+          Setting up your loyalty account...
         </p>
       </div>
     );
