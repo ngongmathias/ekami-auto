@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Calendar, Tag, ArrowLeft, Share2, Facebook, Twitter, Linkedin } from 'lucide-react';
+import { Calendar, Tag, ArrowLeft, Share2, Facebook, Twitter, Linkedin, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { format } from 'date-fns';
@@ -75,6 +75,9 @@ export default function BlogPostPage() {
     
     let shareUrl = '';
     switch (platform) {
+      case 'whatsapp':
+        shareUrl = `https://wa.me/?text=${encodeURIComponent(title + ' - ' + url)}`;
+        break;
       case 'facebook':
         shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
         break;
@@ -192,6 +195,13 @@ export default function BlogPostPage() {
               Share this post
             </h3>
             <div className="flex flex-wrap gap-3">
+              <button
+                onClick={() => handleShare('whatsapp')}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+              >
+                <MessageCircle className="w-5 h-5" />
+                WhatsApp
+              </button>
               <button
                 onClick={() => handleShare('facebook')}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
