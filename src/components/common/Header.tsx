@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { Moon, Sun, User, LogOut, Menu, X } from 'lucide-react';
+import { Moon, Sun, User, LogOut, Menu, X, Gift } from 'lucide-react';
 import { useState } from 'react';
 import CurrencySelector from './CurrencySelector';
 
@@ -20,7 +20,7 @@ export default function Header() {
     { path: '/compare', label: 'Compare' },
     { path: '/repairs', label: t('nav.repairs') },
     { path: '/sell', label: t('nav.sell') },
-    { path: '/loyalty', label: '🎁 Rewards' },
+    { path: '/loyalty', label: 'Rewards', icon: Gift, iconOnly: true }, // Icon only on desktop
     { path: '/tools', label: 'Tools' },
     { path: '/blog', label: t('nav.blog') },
   ];
@@ -50,8 +50,13 @@ export default function Header() {
                 key={link.path}
                 to={link.path}
                 className="text-ekami-charcoal-700 dark:text-ekami-silver-300 hover:text-ekami-gold-600 dark:hover:text-ekami-gold-400 font-medium transition-colors hover-underline-animation"
+                title={link.iconOnly ? link.label : undefined}
               >
-                {link.label}
+                {link.iconOnly && link.icon ? (
+                  <link.icon className="w-5 h-5" />
+                ) : (
+                  link.label
+                )}
               </Link>
             ))}
           </nav>
@@ -114,6 +119,16 @@ export default function Header() {
                 </Link>
               </div>
             )}
+
+            {/* Mobile Rewards Icon */}
+            <Link
+              to="/loyalty"
+              className="md:hidden p-2 text-ekami-gold-600 dark:text-ekami-gold-400 hover:bg-ekami-gold-50 dark:hover:bg-ekami-gold-900/20 rounded-md transition-colors"
+              aria-label="Rewards"
+              title="Rewards"
+            >
+              <Gift className="w-5 h-5" />
+            </Link>
 
             {/* Mobile menu button */}
             <button

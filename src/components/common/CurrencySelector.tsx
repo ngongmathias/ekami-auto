@@ -13,10 +13,12 @@ export default function CurrencySelector() {
 
   return (
     <div className="relative group">
-      <button className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-700 transition-colors">
-        <DollarSign className="w-4 h-4" />
-        <span className="text-sm font-medium">
-          {CURRENCIES.find(c => c.code === currency)?.flag} {currency}
+      <button className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-700 transition-colors">
+        <span className="text-base">
+          {CURRENCIES.find(c => c.code === currency)?.flag}
+        </span>
+        <span className="text-xs font-medium">
+          {currency}
         </span>
       </button>
 
