@@ -1932,6 +1932,13 @@
   "resolved" "https://registry.npmjs.org/@types/range-parser/-/range-parser-1.2.7.tgz"
   "version" "1.2.7"
 
+"@types/react-calendar@^4.1.0":
+  "integrity" "sha512-CZL0+bOJ43+ZxnScd6n6SbA3RvoT/FurMIKevvTnRhLdncTRO7LyvBaFu3Bmwoad8ApVBJsMyAiPO79vGWRbbA=="
+  "resolved" "https://registry.npmjs.org/@types/react-calendar/-/react-calendar-4.1.0.tgz"
+  "version" "4.1.0"
+  dependencies:
+    "react-calendar" "*"
+
 "@types/react-datepicker@^7.0.0":
   "integrity" "sha512-4tWwOUq589tozyQPBVEqGNng5DaZkomx5IVNuur868yYdgjH6RaL373/HKiVt1IDoNNXYiTGspm1F7kjrarM8Q=="
   "resolved" "https://registry.npmjs.org/@types/react-datepicker/-/react-datepicker-7.0.0.tgz"
@@ -7471,7 +7478,7 @@
     "react-overlays" "^5.2.1"
     "uncontrollable" "^7.2.1"
 
-"react-calendar@^4.6.0":
+"react-calendar@*", "react-calendar@^4.8.0":
   "integrity" "sha512-qFgwo+p58sgv1QYMI1oGNaop90eJVKuHTZ3ZgBfrrpUb+9cAexxsKat0sAszgsizPMVo7vOXedV7Lqa0GQGMvA=="
   "resolved" "https://registry.npmjs.org/react-calendar/-/react-calendar-4.8.0.tgz"
   "version" "4.8.0"

@@ -38,8 +38,10 @@ import ReviewsManagement from '../../components/admin/ReviewsManagement';
 import CarLocationManager from '../../components/admin/CarLocationManager';
 import ChatLogs from '../../components/admin/ChatLogs';
 import PriceAlertManagement from '../../components/admin/PriceAlertManagement';
+import CalendarManagement from '../../components/admin/CalendarManagement';
+import FleetCalendarView from '../../components/admin/FleetCalendarView';
 
-type TabType = 'overview' | 'cars' | 'bookings' | 'purchases' | 'sell-requests' | 'repairs' | 'mechanics' | 'reviews' | 'customers' | 'analytics' | 'blog' | 'comments' | 'locations' | 'chat-logs' | 'price-alerts';
+type TabType = 'overview' | 'cars' | 'bookings' | 'purchases' | 'sell-requests' | 'repairs' | 'mechanics' | 'reviews' | 'customers' | 'analytics' | 'blog' | 'comments' | 'locations' | 'chat-logs' | 'price-alerts' | 'calendar' | 'fleet-calendar';
 
 export default function AdminDashboard() {
   const { isSignedIn, isLoaded, user } = useAuth();
@@ -153,6 +155,8 @@ export default function AdminDashboard() {
     { id: 'cars' as TabType, label: 'Cars', icon: Car },
     { id: 'locations' as TabType, label: 'Locations', icon: MapPin },
     { id: 'bookings' as TabType, label: 'Bookings', icon: Calendar },
+    { id: 'fleet-calendar' as TabType, label: 'Fleet Calendar', icon: Calendar },
+    { id: 'calendar' as TabType, label: 'Maintenance Blocks', icon: Calendar },
     { id: 'purchases' as TabType, label: 'Purchases', icon: DollarSign },
     { id: 'sell-requests' as TabType, label: 'Sell Requests', icon: Upload },
     { id: 'repairs' as TabType, label: 'Repairs', icon: Settings },
@@ -443,6 +447,10 @@ export default function AdminDashboard() {
           {activeTab === 'chat-logs' && <ChatLogs />}
 
           {activeTab === 'price-alerts' && <PriceAlertManagement />}
+
+          {activeTab === 'fleet-calendar' && <FleetCalendarView />}
+
+          {activeTab === 'calendar' && <CalendarManagement />}
 
           {activeTab === 'analytics' && (
             <div className="card text-center py-12">

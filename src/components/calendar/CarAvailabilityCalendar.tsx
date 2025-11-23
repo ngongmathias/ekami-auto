@@ -28,6 +28,13 @@ interface Booking {
   user_name?: string;
 }
 
+interface MaintenanceBlock {
+  id: string;
+  start_date: string;
+  end_date: string;
+  reason?: string;
+}
+
 interface CalendarEvent {
   id: string;
   title: string;
@@ -49,6 +56,7 @@ export default function CarAvailabilityCalendar({
   showBookingButton = true 
 }: CarAvailabilityCalendarProps) {
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [maintenanceBlocks, setMaintenanceBlocks] = useState<MaintenanceBlock[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDates, setSelectedDates] = useState<{ start: Date | null; end: Date | null }>({
     start: null,
@@ -63,26 +71,38 @@ export default function CarAvailabilityCalendar({
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      
+      // Fetch bookings
+      const { data: bookingsData, error: bookingsError } = await supabase
         .from('bookings')
         .select('id, start_date, end_date, status, user_name')
         .eq('car_id', carId)
         .in('status', ['pending', 'confirmed', 'active'])
         .gte('end_date', new Date().toISOString());
 
-      if (error) throw error;
-      setBookings(data || []);
+      if (bookingsError) throw bookingsError;
+      setBookings(bookingsData || []);
+
+      // Fetch maintenance blocks
+      const { data: maintenanceData, error: maintenanceError } = await supabase
+        .from('maintenance_blocks')
+        .select('id, start_date, end_date, reason')
+        .eq('car_id', carId)
+        .gte('end_date', new Date().toISOString());
+
+      if (maintenanceError) throw maintenanceError;
+      setMaintenanceBlocks(maintenanceData || []);
     } catch (error) {
-      console.error('Error fetching bookings:', error);
+      console.error('Error fetching availability:', error);
       toast.error('Failed to load availability');
     } finally {
       setLoading(false);
     }
   };
 
-  // Convert bookings to calendar events
+  // Convert bookings and maintenance blocks to calendar events
   const events: CalendarEvent[] = useMemo(() => {
-    return bookings.map((booking) => ({
+    const bookingEvents = bookings.map((booking) => ({
       id: booking.id,
       title: booking.status === 'confirmed' || booking.status === 'active' ? 'Booked' : 'Pending',
       start: new Date(booking.start_date),
@@ -90,11 +110,23 @@ export default function CarAvailabilityCalendar({
       status: 'booked' as const,
       resource: booking,
     }));
-  }, [bookings]);
+
+    const maintenanceEvents = maintenanceBlocks.map((block) => ({
+      id: block.id,
+      title: block.reason || 'Maintenance',
+      start: new Date(block.start_date),
+      end: new Date(block.end_date),
+      status: 'maintenance' as const,
+      resource: block,
+    }));
+
+    return [...bookingEvents, ...maintenanceEvents];
+  }, [bookings, maintenanceBlocks]);
 
   // Check if a date is available
   const isDateAvailable = (date: Date): boolean => {
-    return !bookings.some((booking) => {
+    // Check bookings
+    const hasBooking = bookings.some((booking) => {
       const start = new Date(booking.start_date);
       const end = new Date(booking.end_date);
       return (
@@ -102,6 +134,18 @@ export default function CarAvailabilityCalendar({
         (isBefore(date, end) || isSameDay(date, end))
       );
     });
+
+    // Check maintenance blocks
+    const hasMaintenance = maintenanceBlocks.some((block) => {
+      const start = new Date(block.start_date);
+      const end = new Date(block.end_date);
+      return (
+        (isAfter(date, start) || isSameDay(date, start)) &&
+        (isBefore(date, end) || isSameDay(date, end))
+      );
+    });
+
+    return !hasBooking && !hasMaintenance;
   };
 
   // Handle date selection
@@ -237,6 +281,10 @@ export default function CarAvailabilityCalendar({
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 bg-red-500 rounded"></div>
           <span className="text-gray-700 dark:text-gray-300">Booked</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 bg-orange-500 rounded"></div>
+          <span className="text-gray-700 dark:text-gray-300">Maintenance</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 bg-yellow-400 rounded"></div>

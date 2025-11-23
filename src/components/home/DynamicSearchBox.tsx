@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Calendar, MapPin, DollarSign, Car, Wrench } from 'lucide-react';
+import { Search, Calendar, MapPin, DollarSign, Car, Wrench, Map } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import LocationPicker from '../maps/LocationPicker';
 
 type SearchMode = 'rent' | 'buy' | 'repair';
 
@@ -57,6 +58,10 @@ export default function DynamicSearchBox() {
   
   // Rent filters
   const [location, setLocation] = useState('');
+  const [customLocation, setCustomLocation] = useState('');
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [locationCoords, setLocationCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [showMapPicker, setShowMapPicker] = useState(false);
   const [pickupDate, setPickupDate] = useState('');
   const [returnDate, setReturnDate] = useState('');
   const [bodyType, setBodyType] = useState('');
@@ -74,8 +79,13 @@ export default function DynamicSearchBox() {
   const handleSearch = () => {
     if (mode === 'rent') {
       const params = new URLSearchParams();
-      // 'any' or empty means no filter
-      if (location && location !== 'any') params.append('location', location);
+      // Use custom location if provided, otherwise use dropdown selection
+      const finalLocation = customLocation || location;
+      if (finalLocation && finalLocation !== 'any') params.append('location', finalLocation);
+      if (locationCoords) {
+        params.append('lat', locationCoords.lat.toString());
+        params.append('lng', locationCoords.lng.toString());
+      }
       if (pickupDate) params.append('startDate', pickupDate);
       if (returnDate) params.append('endDate', returnDate);
       if (bodyType && bodyType !== 'any') params.append('bodyType', bodyType.toLowerCase());
@@ -146,20 +156,51 @@ export default function DynamicSearchBox() {
             transition={{ duration: 0.3 }}
           >
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Location */}
-              <select
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="form-input"
-              >
-                <option value="" disabled hidden>Pick-up Location</option>
-                <option value="any">Any Location</option>
-                {CITIES.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
-                ))}
-              </select>
+              {/* Location with Map Toggle */}
+              <div className="relative">
+                <select
+                  value={showMapPicker ? 'map' : showCustomInput ? 'custom' : location}
+                  onChange={(e) => {
+                    if (e.target.value === 'map') {
+                      setShowMapPicker(true);
+                      setShowCustomInput(false);
+                      setLocation('');
+                    } else if (e.target.value === 'custom') {
+                      setShowCustomInput(true);
+                      setShowMapPicker(false);
+                      setLocation('');
+                    } else {
+                      setLocation(e.target.value);
+                      setShowMapPicker(false);
+                      setShowCustomInput(false);
+                    }
+                  }}
+                  className="form-input pr-12"
+                >
+                  <option value="" disabled hidden>Pick-up Location</option>
+                  <option value="any">Any Location</option>
+                  <option value="custom">✏️ Type Custom Location...</option>
+                  <option value="map">📍 Choose on Map...</option>
+                  <option disabled>──────────</option>
+                  {CITIES.map((city) => (
+                    <option key={city} value={city}>
+                      {city}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => setShowMapPicker(!showMapPicker)}
+                  className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg transition-colors ${
+                    showMapPicker 
+                      ? 'bg-ekami-gold-500 text-white' 
+                      : 'bg-ekami-silver-100 dark:bg-ekami-charcoal-700 text-ekami-charcoal-600 dark:text-ekami-silver-400 hover:bg-ekami-gold-100 dark:hover:bg-ekami-charcoal-600'
+                  }`}
+                  title="Choose on map"
+                >
+                  <Map className="w-4 h-4" />
+                </button>
+              </div>
 
               {/* Date Range - Compact */}
               <div className="relative">
@@ -225,6 +266,70 @@ export default function DynamicSearchBox() {
                 ))}
               </select>
             </div>
+
+            {/* Custom Location Input */}
+            <AnimatePresence>
+              {showCustomInput && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="mt-4 overflow-hidden"
+                >
+                  <div className="bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-4">
+                    <label className="block text-sm font-medium text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
+                      Enter your pick-up location:
+                    </label>
+                    <input
+                      type="text"
+                      value={customLocation}
+                      onChange={(e) => setCustomLocation(e.target.value)}
+                      placeholder="e.g., Bonamoussadi, Douala or Near Total Station, Yaoundé"
+                      className="w-full px-4 py-3 border-2 border-blue-300 dark:border-blue-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                      autoFocus
+                    />
+                    <p className="mt-2 text-xs text-blue-600 dark:text-blue-400">
+                      💡 Type any location, neighborhood, or landmark. We'll search for cars nearby.
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Map Picker */}
+            <AnimatePresence>
+              {showMapPicker && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="mt-4 overflow-hidden"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between bg-ekami-gold-50 dark:bg-ekami-gold-900/20 px-4 py-2 rounded-lg">
+                      <p className="text-sm text-ekami-charcoal-700 dark:text-ekami-silver-300">
+                        Click on the map or search for a location
+                      </p>
+                      <button
+                        onClick={() => setShowMapPicker(false)}
+                        className="text-sm text-ekami-gold-600 hover:text-ekami-gold-700 font-medium"
+                      >
+                        Close Map
+                      </button>
+                    </div>
+                    <LocationPicker
+                      onLocationSelect={(loc) => {
+                        setLocation(loc.address);
+                        setLocationCoords({ lat: loc.lat, lng: loc.lng });
+                      }}
+                      height="350px"
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
 
