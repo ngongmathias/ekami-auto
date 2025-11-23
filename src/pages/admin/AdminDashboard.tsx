@@ -131,7 +131,7 @@ export default function AdminDashboard() {
   }
 
   // Simple admin check (in production, check user role from database)
-  const adminEmails = ['kerryngong@ekamiauto.com', 'mathiasngongngai@gmail.com'];
+  const adminEmails = ['kerryngong@ekamiauto.com', 'kerryngong@gmail.com', 'mathiasngongngai@gmail.com'];
   
   // Try multiple ways to get the email
   const userEmail = user?.emailAddresses?.[0]?.emailAddress || 
