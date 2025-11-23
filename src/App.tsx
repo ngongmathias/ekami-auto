@@ -33,6 +33,7 @@ import SignUpPage from './pages/SignUpPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ContactPage from './pages/ContactPage';
 import CarToolsPage from './pages/CarToolsPage';
+import LoyaltyPage from './pages/LoyaltyPage';
 import ChatWidget from './components/chat/ChatWidget';
 import './App.css';
 
@@ -80,6 +81,7 @@ function App() {
                       <Route path="admin" element={<AdminDashboard />} />
                       <Route path="contact" element={<ContactPage />} />
                       <Route path="tools" element={<CarToolsPage />} />
+                      <Route path="loyalty" element={<LoyaltyPage />} />
                     </Route>
                       </Routes>
                     </div>

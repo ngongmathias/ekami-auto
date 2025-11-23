@@ -22,6 +22,7 @@ import {
   MapPin,
   MessageCircle,
   FileText,
+  Award,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -42,8 +43,9 @@ import PriceAlertManagement from '../../components/admin/PriceAlertManagement';
 import CalendarManagement from '../../components/admin/CalendarManagement';
 import FleetCalendarView from '../../components/admin/FleetCalendarView';
 import CarHistoryManagement from '../../components/admin/CarHistoryManagement';
+import LoyaltyManagement from '../../components/admin/LoyaltyManagement';
 
-type TabType = 'overview' | 'cars' | 'bookings' | 'purchases' | 'sell-requests' | 'repairs' | 'mechanics' | 'reviews' | 'customers' | 'analytics' | 'blog' | 'comments' | 'locations' | 'chat-logs' | 'price-alerts' | 'calendar' | 'fleet-calendar' | 'car-history';
+type TabType = 'overview' | 'cars' | 'bookings' | 'purchases' | 'sell-requests' | 'repairs' | 'mechanics' | 'reviews' | 'customers' | 'analytics' | 'blog' | 'comments' | 'locations' | 'chat-logs' | 'price-alerts' | 'calendar' | 'fleet-calendar' | 'car-history' | 'loyalty';
 
 export default function AdminDashboard() {
   const { isSignedIn, isLoaded, user } = useAuth();
@@ -166,6 +168,7 @@ export default function AdminDashboard() {
     { id: 'mechanics' as TabType, label: 'Mechanics', icon: Wrench },
     { id: 'reviews' as TabType, label: 'Reviews', icon: Star },
     { id: 'customers' as TabType, label: 'Customers', icon: Users },
+    { id: 'loyalty' as TabType, label: 'Loyalty Program', icon: Award },
     { id: 'blog' as TabType, label: 'Blog', icon: Package },
     { id: 'comments' as TabType, label: 'Comments', icon: MessageSquare },
     { id: 'chat-logs' as TabType, label: 'Chat Logs', icon: MessageCircle },
@@ -456,6 +459,8 @@ export default function AdminDashboard() {
           {activeTab === 'calendar' && <CalendarManagement />}
 
           {activeTab === 'car-history' && <CarHistoryManagement />}
+
+          {activeTab === 'loyalty' && <LoyaltyManagement />}
 
           {activeTab === 'analytics' && (
             <div className="card text-center py-12">
