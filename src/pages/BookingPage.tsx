@@ -7,6 +7,7 @@ import { getCarBySlug, getCarById, type Car } from '../lib/supabase';
 import DateRangePicker from '../components/booking/DateRangePicker';
 import PriceCalculator from '../components/booking/PriceCalculator';
 import BookingForm, { type BookingFormData } from '../components/booking/BookingForm';
+import CancellationPolicy from '../components/common/CancellationPolicy';
 
 export default function BookingPage() {
   const { id } = useParams<{ id: string }>();
@@ -303,18 +304,25 @@ export default function BookingPage() {
 
             {/* Booking Form - Only show if dates are selected */}
             {rentalDays > 0 && (
-              <BookingForm
-                onSubmit={(data) => {
-                  setExtras({
-                    insurance: data.insurance,
-                    gps: data.gps,
-                    childSeat: data.childSeat,
-                    additionalDriver: data.additionalDriver,
-                  });
-                  handleBookingSubmit(data);
-                }}
-                isSubmitting={isSubmitting}
-              />
+              <>
+                <BookingForm
+                  onSubmit={(data) => {
+                    setExtras({
+                      insurance: data.insurance,
+                      gps: data.gps,
+                      childSeat: data.childSeat,
+                      additionalDriver: data.additionalDriver,
+                    });
+                    handleBookingSubmit(data);
+                  }}
+                  isSubmitting={isSubmitting}
+                />
+                
+                {/* Cancellation Policy */}
+                <div className="mt-8">
+                  <CancellationPolicy compact />
+                </div>
+              </>
             )}
           </div>
 

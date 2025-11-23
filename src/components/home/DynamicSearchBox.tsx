@@ -177,7 +177,7 @@ export default function DynamicSearchBox() {
                   }}
                   className="form-input pr-12"
                 >
-                  <option value="" disabled hidden>Pick-up Location</option>
+                  <option value="" disabled hidden>Delivery Location</option>
                   <option value="any">Any Location</option>
                   <option value="custom">✏️ Type Custom Location...</option>
                   <option value="map">📍 Choose on Map...</option>
@@ -200,6 +200,9 @@ export default function DynamicSearchBox() {
                 >
                   <Map className="w-4 h-4" />
                 </button>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 hidden md:block">
+                  🚗 We deliver the car to you
+                </p>
               </div>
 
               {/* Date Range - Compact */}
@@ -223,7 +226,7 @@ export default function DynamicSearchBox() {
                 <div className="hidden absolute top-full left-0 right-0 mt-2 bg-white dark:bg-ekami-charcoal-800 border-2 border-ekami-silver-200 dark:border-ekami-charcoal-700 rounded-xl p-4 shadow-2xl z-50">
                   <div className="space-y-3">
                     <div>
-                      <label className="text-xs text-ekami-charcoal-600 dark:text-ekami-silver-400 mb-1 block">Pick-up</label>
+                      <label className="text-xs text-ekami-charcoal-600 dark:text-ekami-silver-400 mb-1 block">Start Date</label>
                       <input
                         type="date"
                         value={pickupDate}
