@@ -13,8 +13,9 @@ export interface BookingFormData {
   // Personal Information
   firstName: string;
   lastName: string;
-  email: string;
+  email?: string;
   phone: string;
+  whatsapp: string;
   
   // License Information
   licenseNumber: string;
@@ -50,6 +51,7 @@ export default function BookingForm({ onSubmit, isSubmitting = false }: BookingF
     lastName: '',
     email: '',
     phone: '',
+    whatsapp: '',
     licenseNumber: '',
     licenseExpiry: '',
     pickupLocation: 'Douala Airport',
@@ -72,10 +74,16 @@ export default function BookingForm({ onSubmit, isSubmitting = false }: BookingF
     if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
     if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
     
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    // Email is now optional
+    if (formData.email && formData.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Invalid email format';
+    }
+    
+    // WhatsApp is required
+    if (!formData.whatsapp.trim()) {
+      newErrors.whatsapp = 'WhatsApp number is required';
+    } else if (!/^\+237\s?6\s?\d{2}\s?\d{2}\s?\d{2}\s?\d{2}$/.test(formData.whatsapp)) {
+      newErrors.whatsapp = 'Invalid format. Use: +237 6 XX XX XX XX';
     }
     
     if (!formData.phone.trim()) {
@@ -193,23 +201,26 @@ export default function BookingForm({ onSubmit, isSubmitting = false }: BookingF
 
           <div>
             <label className="block text-sm font-semibold text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
-              Email *
+              WhatsApp Number *
             </label>
             <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-ekami-charcoal-400" />
+              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
               <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleChange('email', e.target.value)}
+                type="tel"
+                value={formData.whatsapp}
+                onChange={(e) => handleChange('whatsapp', e.target.value)}
                 className={`w-full pl-12 pr-4 py-3 bg-white dark:bg-ekami-charcoal-800 border-2 ${
-                  errors.email ? 'border-red-500' : 'border-ekami-silver-200 dark:border-ekami-charcoal-700'
+                  errors.whatsapp ? 'border-red-500' : 'border-ekami-silver-200 dark:border-ekami-charcoal-700'
                 } rounded-xl focus:border-ekami-gold-400 focus:ring-4 focus:ring-ekami-gold-400/20 transition-all text-ekami-charcoal-900 dark:text-white`}
-                placeholder="john@example.com"
+                placeholder="+237 6 52 76 52 81"
               />
             </div>
-            {errors.email && (
-              <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+            {errors.whatsapp && (
+              <p className="mt-1 text-sm text-red-600">{errors.whatsapp}</p>
             )}
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              We'll send booking confirmations via WhatsApp
+            </p>
           </div>
 
           <div>
@@ -230,6 +241,27 @@ export default function BookingForm({ onSubmit, isSubmitting = false }: BookingF
             </div>
             {errors.phone && (
               <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-ekami-charcoal-700 dark:text-ekami-silver-300 mb-2">
+              Email (Optional)
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-ekami-charcoal-400" />
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleChange('email', e.target.value)}
+                className={`w-full pl-12 pr-4 py-3 bg-white dark:bg-ekami-charcoal-800 border-2 ${
+                  errors.email ? 'border-red-500' : 'border-ekami-silver-200 dark:border-ekami-charcoal-700'
+                } rounded-xl focus:border-ekami-gold-400 focus:ring-4 focus:ring-ekami-gold-400/20 transition-all text-ekami-charcoal-900 dark:text-white`}
+                placeholder="john@example.com (optional)"
+              />
+            </div>
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-600">{errors.email}</p>
             )}
           </div>
         </div>
