@@ -67,20 +67,31 @@ export default function LoyaltyManagement() {
       setLoading(true);
 
       // Fetch members
-      const { data: membersData } = await supabase
+      const { data: membersData, error: membersError } = await supabase
         .from('loyalty_members')
         .select('*')
         .order('created_at', { ascending: false });
 
-      setMembers(membersData || []);
+      if (membersError) {
+        console.error('Error fetching members:', membersError);
+        toast.error('Failed to load members: ' + membersError.message);
+      } else {
+        console.log('Fetched members:', membersData?.length, membersData);
+        setMembers(membersData || []);
+      }
 
       // Fetch rewards
-      const { data: rewardsData } = await supabase
+      const { data: rewardsData, error: rewardsError } = await supabase
         .from('loyalty_rewards')
         .select('*')
         .order('display_order');
 
-      setRewards(rewardsData || []);
+      if (rewardsError) {
+        console.error('Error fetching rewards:', rewardsError);
+      } else {
+        console.log('Fetched rewards:', rewardsData?.length);
+        setRewards(rewardsData || []);
+      }
 
       // Calculate stats
       if (membersData) {
@@ -277,7 +288,19 @@ export default function LoyaltyManagement() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {members.map((member) => (
+                {members.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center">
+                      <Award className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                      <p className="text-gray-600 dark:text-gray-400">
+                        No loyalty members found
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
+                        Members will appear here once they join the loyalty program
+                      </p>
+                    </td>
+                  </tr>
+                ) : members.map((member) => (
                   <tr key={member.id}>
                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">
                       {member.email}
