@@ -155,7 +155,7 @@ export default function DynamicSearchBox() {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
               {/* Location with Map Toggle */}
               <div className="relative">
                 <select
@@ -342,7 +342,7 @@ export default function DynamicSearchBox() {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
               {/* Make */}
               <select
                 value={make}
