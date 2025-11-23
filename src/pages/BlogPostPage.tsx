@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import CommentSection from '../components/blog/CommentSection';
+import { updateMetaTags, resetMetaTags } from '../utils/metaTags';
 
 interface BlogPost {
   id: string;
@@ -32,6 +33,11 @@ export default function BlogPostPage() {
     if (slug) {
       fetchPost();
     }
+    
+    // Reset meta tags when component unmounts
+    return () => {
+      resetMetaTags();
+    };
   }, [slug]);
 
   const fetchPost = async () => {
@@ -48,6 +54,17 @@ export default function BlogPostPage() {
 
       if (postError) throw postError;
       setPost(postData);
+
+      // Update meta tags for social sharing
+      if (postData) {
+        updateMetaTags({
+          title: postData.meta_title || postData.title,
+          description: postData.meta_description || postData.excerpt,
+          image: postData.featured_image || 'https://ekamiauto.com/logo.jpg',
+          url: window.location.href,
+          type: 'article'
+        });
+      }
 
       // Fetch related posts from same category
       if (postData) {
