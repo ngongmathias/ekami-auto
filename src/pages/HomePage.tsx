@@ -6,9 +6,11 @@ import { useEffect, useState } from 'react';
 import { getAvailableCarsForRent, type Car as CarType } from '../lib/supabase';
 import toast from 'react-hot-toast';
 import DynamicSearchBox from '../components/home/DynamicSearchBox';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 export default function HomePage() {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const [featuredCars, setFeaturedCars] = useState<CarType[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -31,18 +33,18 @@ export default function HomePage() {
   const features = [
     {
       icon: <Car className="w-8 h-8" />,
-      title: 'Wide Selection',
-      description: 'Choose from hundreds of verified cars',
+      title: t('home.features.wideSelection'),
+      description: t('home.features.wideSelectionDesc'),
     },
     {
       icon: <Shield className="w-8 h-8" />,
-      title: 'Trusted & Safe',
-      description: 'All cars inspected and certified',
+      title: t('home.features.trustedSafe'),
+      description: t('home.features.trustedSafeDesc'),
     },
     {
       icon: <DollarSign className="w-8 h-8" />,
-      title: 'Best Prices',
-      description: 'Competitive rates across Cameroon',
+      title: t('home.features.bestPrices'),
+      description: t('home.features.bestPricesDesc'),
     },
   ];
 
@@ -131,10 +133,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-display font-bold text-ekami-charcoal-900 dark:text-white mb-4">
-              Featured Cars
+              {t('home.featuredCars')}
             </h2>
             <p className="text-xl text-ekami-charcoal-600 dark:text-ekami-silver-300">
-              Explore our premium selection of vehicles
+              {t('home.featuredCarsSubtitle')}
             </p>
           </div>
 
@@ -182,14 +184,14 @@ export default function HomePage() {
                     {/* Pricing */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-ekami-charcoal-500 dark:text-ekami-silver-500">From</p>
+                        <p className="text-sm text-ekami-charcoal-500 dark:text-ekami-silver-500">{t('home.from')}</p>
                         <p className="text-2xl font-bold text-ekami-gold-600">
-                          {car.price_rent_daily?.toLocaleString()} XAF
-                          <span className="text-sm font-normal text-ekami-charcoal-500 dark:text-ekami-silver-500">/day</span>
+                          {formatPrice(car.price_rent_daily || 0)}
+                          <span className="text-sm font-normal text-ekami-charcoal-500 dark:text-ekami-silver-500">{t('home.perDay')}</span>
                         </p>
                       </div>
                       <div className="px-4 py-2 bg-gradient-to-r from-ekami-charcoal-700 to-ekami-charcoal-800 text-white rounded-xl font-semibold text-sm group-hover:from-ekami-gold-500 group-hover:to-ekami-gold-600 transition-all">
-                        View Details
+                        {t('home.viewDetails')}
                       </div>
                     </div>
 

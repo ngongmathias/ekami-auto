@@ -18,6 +18,22 @@
     "searchCars": "Search Cars",
     "talkToAI": "Talk to AI Assistant"
   },
+  "home": {
+    "featuredCars": "Featured Cars",
+    "featuredCarsSubtitle": "Explore our premium selection of vehicles",
+    "viewAllCars": "View All Cars",
+    "features": {
+      "wideSelection": "Wide Selection",
+      "wideSelectionDesc": "Choose from hundreds of verified cars",
+      "trustedSafe": "Trusted & Safe",
+      "trustedSafeDesc": "All cars inspected and certified",
+      "bestPrices": "Best Prices",
+      "bestPricesDesc": "Competitive rates across Cameroon"
+    },
+    "from": "From",
+    "perDay": "/day",
+    "viewDetails": "View Details"
+  },
   "search": {
     "rent": "Rent",
     "buy": "Buy",

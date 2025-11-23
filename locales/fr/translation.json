@@ -15,8 +15,24 @@
   "hero": {
     "title": "Location, vente et réparation de voitures intelligentes au Cameroun",
     "subtitle": "Réservez, achetez ou réparez votre voiture avec l'assistance de l'IA",
-    "searchCars": "Rechercher des Voitures",
-    "talkToAI": "Parler à l'Assistant IA"
+    "searchCars": "Rechercher des voitures",
+    "talkToAI": "Parler à l'assistant IA"
+  },
+  "home": {
+    "featuredCars": "Voitures en vedette",
+    "featuredCarsSubtitle": "Explorez notre sélection premium de véhicules",
+    "viewAllCars": "Voir toutes les voitures",
+    "features": {
+      "wideSelection": "Large sélection",
+      "wideSelectionDesc": "Choisissez parmi des centaines de voitures vérifiées",
+      "trustedSafe": "Fiable et sûr",
+      "trustedSafeDesc": "Toutes les voitures inspectées et certifiées",
+      "bestPrices": "Meilleurs prix",
+      "bestPricesDesc": "Tarifs compétitifs à travers le Cameroun"
+    },
+    "from": "À partir de",
+    "perDay": "/jour",
+    "viewDetails": "Voir les détails"
   },
   "search": {
     "rent": "Louer",
