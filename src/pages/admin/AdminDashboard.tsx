@@ -21,6 +21,7 @@ import {
   Bell,
   MapPin,
   MessageCircle,
+  FileText,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -40,8 +41,9 @@ import ChatLogs from '../../components/admin/ChatLogs';
 import PriceAlertManagement from '../../components/admin/PriceAlertManagement';
 import CalendarManagement from '../../components/admin/CalendarManagement';
 import FleetCalendarView from '../../components/admin/FleetCalendarView';
+import CarHistoryManagement from '../../components/admin/CarHistoryManagement';
 
-type TabType = 'overview' | 'cars' | 'bookings' | 'purchases' | 'sell-requests' | 'repairs' | 'mechanics' | 'reviews' | 'customers' | 'analytics' | 'blog' | 'comments' | 'locations' | 'chat-logs' | 'price-alerts' | 'calendar' | 'fleet-calendar';
+type TabType = 'overview' | 'cars' | 'bookings' | 'purchases' | 'sell-requests' | 'repairs' | 'mechanics' | 'reviews' | 'customers' | 'analytics' | 'blog' | 'comments' | 'locations' | 'chat-logs' | 'price-alerts' | 'calendar' | 'fleet-calendar' | 'car-history';
 
 export default function AdminDashboard() {
   const { isSignedIn, isLoaded, user } = useAuth();
@@ -153,6 +155,7 @@ export default function AdminDashboard() {
   const tabs = [
     { id: 'overview' as TabType, label: 'Overview', icon: LayoutDashboard },
     { id: 'cars' as TabType, label: 'Cars', icon: Car },
+    { id: 'car-history' as TabType, label: 'Car History', icon: FileText },
     { id: 'locations' as TabType, label: 'Locations', icon: MapPin },
     { id: 'bookings' as TabType, label: 'Bookings', icon: Calendar },
     { id: 'fleet-calendar' as TabType, label: 'Fleet Calendar', icon: Calendar },
@@ -451,6 +454,8 @@ export default function AdminDashboard() {
           {activeTab === 'fleet-calendar' && <FleetCalendarView />}
 
           {activeTab === 'calendar' && <CalendarManagement />}
+
+          {activeTab === 'car-history' && <CarHistoryManagement />}
 
           {activeTab === 'analytics' && (
             <div className="card text-center py-12">
