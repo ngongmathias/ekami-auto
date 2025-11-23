@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { DollarSign } from 'lucide-react';
 import { useCurrency, Currency } from '../../contexts/CurrencyContext';
 import { motion } from 'framer-motion';
@@ -10,10 +11,14 @@ const CURRENCIES: { code: Currency; name: string; symbol: string; flag: string }
 
 export default function CurrencySelector() {
   const { currency, setCurrency } = useCurrency();
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="relative group">
-      <button className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-700 transition-colors">
+    <div className="relative">
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-ekami-silver-100 dark:hover:bg-ekami-charcoal-700 transition-colors"
+      >
         <span className="text-base">
           {CURRENCIES.find(c => c.code === currency)?.flag}
         </span>
@@ -23,11 +28,12 @@ export default function CurrencySelector() {
       </button>
 
       {/* Dropdown */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        whileHover={{ opacity: 1, y: 0 }}
-        className="absolute right-0 mt-2 w-48 bg-white dark:bg-ekami-charcoal-800 rounded-xl shadow-lg border border-ekami-silver-200 dark:border-ekami-charcoal-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50"
-      >
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="absolute right-0 mt-2 w-48 bg-white dark:bg-ekami-charcoal-800 rounded-xl shadow-lg border border-ekami-silver-200 dark:border-ekami-charcoal-700 z-50"
+        >
         <div className="p-2">
           <div className="text-xs font-semibold text-ekami-charcoal-500 dark:text-ekami-silver-500 px-3 py-2">
             Select Currency
@@ -35,7 +41,10 @@ export default function CurrencySelector() {
           {CURRENCIES.map((curr) => (
             <button
               key={curr.code}
-              onClick={() => setCurrency(curr.code)}
+              onClick={() => {
+                setCurrency(curr.code);
+                setIsOpen(false);
+              }}
               className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
                 currency === curr.code
                   ? 'bg-ekami-gold-100 dark:bg-ekami-gold-900/20 text-ekami-gold-700 dark:text-ekami-gold-400'
@@ -53,7 +62,8 @@ export default function CurrencySelector() {
             </button>
           ))}
         </div>
-      </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 }

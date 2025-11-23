@@ -71,8 +71,8 @@ export default function Header() {
               {language === 'en' ? 'FR' : 'EN'}
             </button>
 
-            {/* Currency Selector */}
-            <div className="hidden lg:block">
+            {/* Currency Selector - Show on all devices */}
+            <div>
               <CurrencySelector />
             </div>
 
@@ -84,6 +84,16 @@ export default function Header() {
             >
               {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
+
+            {/* Mobile Rewards Icon */}
+            <Link
+              to="/loyalty"
+              className="lg:hidden p-2 text-ekami-gold-600 dark:text-ekami-gold-400 hover:bg-ekami-gold-50 dark:hover:bg-ekami-gold-900/20 rounded-md transition-colors"
+              aria-label="Rewards"
+              title="Rewards"
+            >
+              <Gift className="w-5 h-5" />
+            </Link>
 
             {/* Auth */}
             {isSignedIn ? (
@@ -119,16 +129,6 @@ export default function Header() {
                 </Link>
               </div>
             )}
-
-            {/* Mobile Rewards Icon */}
-            <Link
-              to="/loyalty"
-              className="md:hidden p-2 text-ekami-gold-600 dark:text-ekami-gold-400 hover:bg-ekami-gold-50 dark:hover:bg-ekami-gold-900/20 rounded-md transition-colors"
-              aria-label="Rewards"
-              title="Rewards"
-            >
-              <Gift className="w-5 h-5" />
-            </Link>
 
             {/* Mobile menu button */}
             <button

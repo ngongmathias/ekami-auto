@@ -1,4 +1,4 @@
-# ⚡ Quick Setup Guide - 3 Simple Steps
+# ⚡ Quick Setup Guide - ONE SCRIPT TO RULE THEM ALL!
 
 ## 🎯 Goal
 Enable admin features in 3 minutes!
