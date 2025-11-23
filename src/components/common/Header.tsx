@@ -130,10 +130,10 @@ export default function Header() {
               </div>
             )}
 
-            {/* Mobile menu button */}
+            {/* Mobile menu button - Always show on mobile/tablet */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-ekami-charcoal-700 dark:text-ekami-silver-300"
+              className="lg:hidden p-2 text-ekami-charcoal-700 dark:text-ekami-silver-300"
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -143,7 +143,7 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="lg:hidden py-4 border-t border-gray-200 dark:border-gray-700">
             <nav className="flex flex-col space-y-2">
               {navLinks.map((link) => (
                 <Link
