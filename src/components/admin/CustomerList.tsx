@@ -2,20 +2,10 @@ import { useState, useEffect } from 'react';
 import { Search, Users, Mail, Phone } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { supabase } from '../../lib/supabase';
-
-interface Customer {
-  id: string;
-  full_name?: string;
-  phone?: string;
-  loyalty_points: number;
-  created_at: string;
-  // From auth
-  email?: string;
-}
+import { getAllUserProfiles, type UserProfile } from '../../lib/userProfile';
 
 export default function CustomerList() {
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customers, setCustomers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -26,13 +16,8 @@ export default function CustomerList() {
   const fetchCustomers = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setCustomers(data || []);
+      const profiles = await getAllUserProfiles();
+      setCustomers(profiles);
     } catch (error) {
       console.error('Error fetching customers:', error);
       toast.error('Failed to load customers');
@@ -125,6 +110,14 @@ export default function CustomerList() {
                     </td>
                     <td className="py-4 px-6">
                       <div className="space-y-1">
+                        {customer.email && (
+                          <div className="flex items-center space-x-2 text-sm">
+                            <Mail className="w-4 h-4 text-ekami-charcoal-400" />
+                            <span className="text-ekami-charcoal-700 dark:text-ekami-silver-300">
+                              {customer.email}
+                            </span>
+                          </div>
+                        )}
                         {customer.phone && (
                           <div className="flex items-center space-x-2 text-sm">
                             <Phone className="w-4 h-4 text-ekami-charcoal-400" />
