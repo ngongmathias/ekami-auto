@@ -1,10 +1,10 @@
 {
   "nav": {
     "home": "Home",
-    "rent": "Rent a Car",
-    "buy": "Buy a Car",
-    "repairs": "Repairs & Services",
-    "sell": "Sell Your Car",
+    "rent": "Rent",
+    "buy": "Buy",
+    "repairs": "Repairs",
+    "sell": "Sell",
     "blog": "Blog",
     "aiAssistant": "AI Assistant",
     "account": "Account",

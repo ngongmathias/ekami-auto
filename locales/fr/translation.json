@@ -1,10 +1,10 @@
 {
   "nav": {
     "home": "Accueil",
-    "rent": "Louer une Voiture",
-    "buy": "Acheter une Voiture",
-    "repairs": "Réparations & Services",
-    "sell": "Vendre Votre Voiture",
+    "rent": "Louer",
+    "buy": "Acheter",
+    "repairs": "Réparations",
+    "sell": "Vendre",
     "blog": "Blog",
     "aiAssistant": "Assistant IA",
     "account": "Compte",
