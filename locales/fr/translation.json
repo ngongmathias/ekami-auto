@@ -187,5 +187,120 @@
     "km": "km",
     "darkMode": "Mode Sombre",
     "lightMode": "Mode Clair"
+  },
+  "tools": {
+    "title": "Outils & Calculateurs Auto",
+    "subtitle": "Votre boîte à outils automobile complète",
+    "maintenance": {
+      "title": "Rappels d'Entretien",
+      "description": "Ne manquez jamais les vidanges, rotations de pneus ou inspections",
+      "currentMileage": "Kilométrage Actuel (km)",
+      "addReminder": "Ajouter un Rappel d'Entretien",
+      "type": "Type d'Entretien",
+      "lastDone": "Dernière Fois",
+      "dueDate": "Date d'Échéance",
+      "dueAt": "Échéance à",
+      "remaining": "Restant",
+      "overdue": "EN RETARD",
+      "dueSoon": "BIENTÔT DÛ",
+      "ok": "OK",
+      "markDone": "Terminé",
+      "oilChange": "Vidange d'Huile",
+      "tireRotation": "Rotation des Pneus",
+      "brakeInspection": "Inspection des Freins"
+    },
+    "valueCalculator": {
+      "title": "Calculateur de Valeur Auto",
+      "description": "Estimez la valeur marchande actuelle de votre voiture",
+      "make": "Marque",
+      "model": "Modèle",
+      "year": "Année",
+      "mileage": "Kilométrage (km)",
+      "condition": "État",
+      "accidents": "Historique d'Accidents",
+      "owners": "Nombre de Propriétaires Précédents",
+      "calculate": "Calculer la Valeur",
+      "estimatedValue": "Valeur Marchande Estimée",
+      "tradeIn": "Valeur de Reprise",
+      "privateSale": "Vente Privée",
+      "dealerPrice": "Prix Concessionnaire",
+      "excellent": "Excellent - Comme neuf",
+      "good": "Bon - Usure mineure",
+      "fair": "Moyen - Usure notable",
+      "poor": "Mauvais - Nécessite des réparations",
+      "noAccidents": "Aucun accident",
+      "minorAccidents": "Accidents mineurs",
+      "majorAccidents": "Accidents majeurs"
+    },
+    "fuelCalculator": {
+      "title": "Calculateur de Coût de Carburant",
+      "description": "Calculez les coûts de trajet et l'efficacité énergétique",
+      "comingSoon": "Bientôt Disponible!"
+    },
+    "loanCalculator": {
+      "title": "Calculateur de Prêt Auto",
+      "description": "Calculez les paiements mensuels et les intérêts totaux",
+      "comingSoon": "Bientôt Disponible!"
+    },
+    "insuranceEstimator": {
+      "title": "Estimateur d'Assurance",
+      "description": "Estimez les coûts d'assurance pour votre véhicule",
+      "comingSoon": "Bientôt Disponible!"
+    }
+  },
+  "pwa": {
+    "install": {
+      "title": "Installer Ekami Auto",
+      "subtitle": "Ajouter à l'Écran d'Accueil",
+      "description": "Installez Ekami Auto sur votre appareil pour un accès rapide, un support hors ligne et une expérience d'application native!",
+      "installNow": "Installer Maintenant",
+      "later": "Plus Tard",
+      "benefits": {
+        "fast": "Rapide & Hors Ligne",
+        "native": "Sensation Native",
+        "noStore": "Pas d'App Store"
+      },
+      "iosInstructions": {
+        "title": "Pour installer cette application:",
+        "step1": "Appuyez sur le bouton Partager",
+        "step2": "Faites défiler vers le bas et appuyez sur \"Ajouter à l'écran d'accueil\"",
+        "step3": "Appuyez sur \"Ajouter\" pour confirmer"
+      }
+    },
+    "update": {
+      "title": "Mise à Jour Disponible",
+      "subtitle": "Nouvelle version prête",
+      "description": "Une nouvelle version d'Ekami Auto est disponible. Mettez à jour maintenant pour obtenir les dernières fonctionnalités et améliorations!",
+      "updateNow": "Mettre à Jour Maintenant"
+    }
+  },
+  "calendar": {
+    "title": "Disponibilité du Calendrier",
+    "checkAvailability": "Vérifier la Disponibilité",
+    "selectDates": "Sélectionner les Dates",
+    "available": "Disponible",
+    "booked": "Réservé",
+    "maintenance": "Entretien",
+    "legend": "Légende",
+    "bookNow": "Réserver Maintenant",
+    "fleetCalendar": "Calendrier de la Flotte",
+    "viewAll": "Voir Toutes les Voitures",
+    "filterByCar": "Filtrer par Voiture",
+    "monthView": "Mois",
+    "weekView": "Semaine",
+    "dayView": "Jour",
+    "agendaView": "Agenda"
+  },
+  "priceAlerts": {
+    "title": "Alertes de Baisse de Prix",
+    "description": "Soyez notifié lorsque les prix baissent sur vos voitures préférées",
+    "createAlert": "Créer une Alerte",
+    "myAlerts": "Mes Alertes",
+    "targetPrice": "Prix Cible",
+    "currentPrice": "Prix Actuel",
+    "notifyWhen": "Me notifier lorsque le prix baisse à",
+    "active": "Actif",
+    "triggered": "Déclenché",
+    "emailSent": "Email Envoyé"
   }
 }

@@ -187,5 +187,120 @@
     "km": "km",
     "darkMode": "Dark Mode",
     "lightMode": "Light Mode"
+  },
+  "tools": {
+    "title": "Car Tools & Calculators",
+    "subtitle": "Your complete automotive toolkit",
+    "maintenance": {
+      "title": "Maintenance Reminders",
+      "description": "Never miss oil changes, tire rotations, or inspections",
+      "currentMileage": "Current Mileage (km)",
+      "addReminder": "Add Maintenance Reminder",
+      "type": "Maintenance Type",
+      "lastDone": "Last Done",
+      "dueDate": "Due Date",
+      "dueAt": "Due at",
+      "remaining": "Remaining",
+      "overdue": "OVERDUE",
+      "dueSoon": "DUE SOON",
+      "ok": "OK",
+      "markDone": "Done",
+      "oilChange": "Oil Change",
+      "tireRotation": "Tire Rotation",
+      "brakeInspection": "Brake Inspection"
+    },
+    "valueCalculator": {
+      "title": "Car Value Calculator",
+      "description": "Estimate your car's current market value",
+      "make": "Make",
+      "model": "Model",
+      "year": "Year",
+      "mileage": "Mileage (km)",
+      "condition": "Condition",
+      "accidents": "Accident History",
+      "owners": "Number of Previous Owners",
+      "calculate": "Calculate Value",
+      "estimatedValue": "Estimated Market Value",
+      "tradeIn": "Trade-In Value",
+      "privateSale": "Private Sale",
+      "dealerPrice": "Dealer Price",
+      "excellent": "Excellent - Like new",
+      "good": "Good - Minor wear",
+      "fair": "Fair - Noticeable wear",
+      "poor": "Poor - Needs repairs",
+      "noAccidents": "No accidents",
+      "minorAccidents": "Minor accidents",
+      "majorAccidents": "Major accidents"
+    },
+    "fuelCalculator": {
+      "title": "Fuel Cost Calculator",
+      "description": "Calculate trip costs and fuel efficiency",
+      "comingSoon": "Coming Soon!"
+    },
+    "loanCalculator": {
+      "title": "Car Loan Calculator",
+      "description": "Calculate monthly payments and total interest",
+      "comingSoon": "Coming Soon!"
+    },
+    "insuranceEstimator": {
+      "title": "Insurance Estimator",
+      "description": "Estimate insurance costs for your vehicle",
+      "comingSoon": "Coming Soon!"
+    }
+  },
+  "pwa": {
+    "install": {
+      "title": "Install Ekami Auto",
+      "subtitle": "Add to Home Screen",
+      "description": "Install Ekami Auto on your device for quick access, offline support, and a native app experience!",
+      "installNow": "Install Now",
+      "later": "Later",
+      "benefits": {
+        "fast": "Fast & Offline",
+        "native": "Native Feel",
+        "noStore": "No App Store"
+      },
+      "iosInstructions": {
+        "title": "To install this app:",
+        "step1": "Tap the Share button",
+        "step2": "Scroll down and tap \"Add to Home Screen\"",
+        "step3": "Tap \"Add\" to confirm"
+      }
+    },
+    "update": {
+      "title": "Update Available",
+      "subtitle": "New version ready",
+      "description": "A new version of Ekami Auto is available. Update now to get the latest features and improvements!",
+      "updateNow": "Update Now"
+    }
+  },
+  "calendar": {
+    "title": "Calendar Availability",
+    "checkAvailability": "Check Availability",
+    "selectDates": "Select Dates",
+    "available": "Available",
+    "booked": "Booked",
+    "maintenance": "Maintenance",
+    "legend": "Legend",
+    "bookNow": "Book Now",
+    "fleetCalendar": "Fleet Calendar",
+    "viewAll": "View All Cars",
+    "filterByCar": "Filter by Car",
+    "monthView": "Month",
+    "weekView": "Week",
+    "dayView": "Day",
+    "agendaView": "Agenda"
+  },
+  "priceAlerts": {
+    "title": "Price Drop Alerts",
+    "description": "Get notified when prices drop on your favorite cars",
+    "createAlert": "Create Alert",
+    "myAlerts": "My Alerts",
+    "targetPrice": "Target Price",
+    "currentPrice": "Current Price",
+    "notifyWhen": "Notify me when price drops to",
+    "active": "Active",
+    "triggered": "Triggered",
+    "emailSent": "Email Sent"
   }
 }
