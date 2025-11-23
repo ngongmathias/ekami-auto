@@ -13,7 +13,7 @@ import { motion } from 'framer-motion';
 import MaintenanceReminder from '../components/tools/MaintenanceReminder';
 import CarValueCalculator from '../components/tools/CarValueCalculator';
 
-type ToolType = 'home' | 'maintenance' | 'value' | 'fuel' | 'loan' | 'insurance';
+type ToolType = 'home' | 'maintenance' | 'value' | 'fuel' | 'downpayment' | 'insurance';
 
 export default function CarToolsPage() {
   const [activeTool, setActiveTool] = useState<ToolType>('home');
@@ -44,12 +44,12 @@ export default function CarToolsPage() {
       features: ['Trip cost estimates', 'Fuel efficiency', 'Cost comparisons']
     },
     {
-      id: 'loan' as ToolType,
-      name: 'Car Loan Calculator',
-      description: 'Calculate monthly payments and total interest',
+      id: 'downpayment' as ToolType,
+      name: 'Down Payment Calculator',
+      description: 'Calculate how much you need for a down payment',
       icon: Calculator,
       color: 'from-purple-500 to-purple-600',
-      features: ['Monthly payments', 'Interest breakdown', 'Amortization schedule']
+      features: ['Down payment amount', 'Payment plans', 'Budget planning']
     },
     {
       id: 'insurance' as ToolType,
@@ -69,8 +69,8 @@ export default function CarToolsPage() {
         return <CarValueCalculator />;
       case 'fuel':
         return <ComingSoonTool name="Fuel Cost Calculator" />;
-      case 'loan':
-        return <ComingSoonTool name="Car Loan Calculator" />;
+      case 'downpayment':
+        return <ComingSoonTool name="Down Payment Calculator" />;
       case 'insurance':
         return <ComingSoonTool name="Insurance Estimator" />;
       default:

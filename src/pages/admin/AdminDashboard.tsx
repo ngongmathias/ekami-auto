@@ -132,8 +132,18 @@ export default function AdminDashboard() {
 
   // Simple admin check (in production, check user role from database)
   const adminEmails = ['kerryngong@ekamiauto.com', 'mathiasngongngai@gmail.com'];
-  const userEmail = user?.emailAddresses?.[0]?.emailAddress;
-  const isAdmin = userEmail ? adminEmails.includes(userEmail) : false;
+  
+  // Try multiple ways to get the email
+  const userEmail = user?.emailAddresses?.[0]?.emailAddress || 
+                    user?.primaryEmailAddress?.emailAddress ||
+                    user?.email;
+  
+  // Debug logging
+  console.log('Admin Check - User object:', user);
+  console.log('Admin Check - Extracted email:', userEmail);
+  console.log('Admin Check - Is admin?:', adminEmails.includes(userEmail || ''));
+  
+  const isAdmin = userEmail ? adminEmails.includes(userEmail.toLowerCase()) : false;
 
   if (!isAdmin) {
     return (
