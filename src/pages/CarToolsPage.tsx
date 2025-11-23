@@ -45,11 +45,11 @@ export default function CarToolsPage() {
     },
     {
       id: 'downpayment' as ToolType,
-      name: 'Down Payment Calculator',
-      description: 'Calculate how much you need for a down payment',
+      name: 'Payment Calculator',
+      description: 'Plan your purchase with flexible payment options',
       icon: Calculator,
       color: 'from-purple-500 to-purple-600',
-      features: ['Down payment amount', 'Payment plans', 'Budget planning']
+      features: ['Down payment planning', 'Monthly budget calculator', 'Total cost breakdown']
     },
     {
       id: 'insurance' as ToolType,
@@ -70,7 +70,7 @@ export default function CarToolsPage() {
       case 'fuel':
         return <ComingSoonTool name="Fuel Cost Calculator" />;
       case 'downpayment':
-        return <ComingSoonTool name="Down Payment Calculator" />;
+        return <ComingSoonTool name="Payment Calculator" />;
       case 'insurance':
         return <ComingSoonTool name="Insurance Estimator" />;
       default:

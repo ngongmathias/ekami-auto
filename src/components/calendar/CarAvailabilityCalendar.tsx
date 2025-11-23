@@ -25,7 +25,7 @@ interface Booking {
   start_date: string;
   end_date: string;
   status: string;
-  user_name?: string;
+  customer_name?: string;
 }
 
 interface MaintenanceBlock {
@@ -75,7 +75,7 @@ export default function CarAvailabilityCalendar({
       // Fetch bookings
       const { data: bookingsData, error: bookingsError } = await supabase
         .from('bookings')
-        .select('id, start_date, end_date, status, user_name')
+        .select('id, start_date, end_date, status, customer_name')
         .eq('car_id', carId)
         .in('status', ['pending', 'confirmed', 'active'])
         .gte('end_date', new Date().toISOString());
