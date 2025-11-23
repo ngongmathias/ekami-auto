@@ -11,7 +11,10 @@ import {
   Twitter,
   Mail,
   Copy,
-  Check
+  Check,
+  MapPin,
+  Clock,
+  Truck
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -25,6 +28,7 @@ import MapDisplay from '../components/maps/MapDisplay';
 import CarAvailabilityCalendar from '../components/calendar/CarAvailabilityCalendar';
 import Car360Viewer from '../components/cars/Car360Viewer';
 import PriceAlertModal from '../components/alerts/PriceAlertModal';
+import { getDeliveryEstimate, getDeliveryMessage, isImmediatelyAvailable, getAvailabilityBadgeColor } from '../utils/deliveryTime';
 import '../components/calendar/calendar.css';
 
 export default function CarDetailPage() {
@@ -40,6 +44,7 @@ export default function CarDetailPage() {
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showPriceAlert, setShowPriceAlert] = useState(false);
+  const [customerCity, setCustomerCity] = useState('Yaoundé'); // Default to Yaoundé
 
   useEffect(() => {
     async function fetchCarData() {
@@ -195,6 +200,34 @@ export default function CarDetailPage() {
             <p className="text-xl text-ekami-charcoal-600 dark:text-ekami-silver-400">
               {car.year} • {car.transmission} • {car.fuel_type}
             </p>
+            
+            {/* Car Location & Delivery Info */}
+            {car.current_city && (
+              <div className="mt-4 space-y-2">
+                {/* Current Location */}
+                <div className="flex items-center gap-2 text-sm">
+                  <MapPin className="w-4 h-4 text-ekami-gold-500" />
+                  <span className="text-ekami-charcoal-700 dark:text-ekami-silver-300">
+                    Currently in: <strong className="text-ekami-charcoal-900 dark:text-white">{car.current_city}</strong>
+                  </span>
+                </div>
+                
+                {/* Delivery Time Badge */}
+                {!isImmediatelyAvailable(car.current_city, customerCity) && (
+                  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${getAvailabilityBadgeColor(car.current_city, customerCity)}`}>
+                    <Truck className="w-4 h-4" />
+                    <span>{getDeliveryMessage(car.current_city, customerCity)}</span>
+                  </div>
+                )}
+                
+                {isImmediatelyAvailable(car.current_city, customerCity) && (
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                    <Clock className="w-4 h-4" />
+                    <span>✅ Available now in {car.current_city} - Ready for immediate pickup</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Action Buttons */}

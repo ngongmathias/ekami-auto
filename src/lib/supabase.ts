@@ -49,6 +49,7 @@ export interface Car {
   available_for_sale: boolean;
   location?: string;
   city?: string;
+  current_city?: string;
   images?: string[];
   images_360?: string[];
   video_url?: string;

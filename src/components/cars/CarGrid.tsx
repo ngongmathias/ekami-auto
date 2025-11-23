@@ -7,10 +7,12 @@ import {
   Settings, 
   Users,
   TrendingUp,
-  Star
+  Star,
+  Truck
 } from 'lucide-react';
 import { useState } from 'react';
 import type { Car } from '../../lib/supabase';
+import { isImmediatelyAvailable } from '../../utils/deliveryTime';
 
 interface CarGridProps {
   cars: Car[];
@@ -127,10 +129,13 @@ export default function CarGrid({ cars, viewMode, mode = 'rent' }: CarGridProps)
                     <Users className="w-4 h-4" />
                     <span className="text-sm">{car.seats} Seats</span>
                   </div>
-                  {(car.city || car.location) && (
-                    <div className="flex items-center space-x-2 text-ekami-charcoal-600 dark:text-ekami-silver-400">
+                  {car.current_city && (
+                    <div className="flex items-center space-x-2 text-ekami-gold-600 dark:text-ekami-gold-400">
                       <MapPin className="w-4 h-4" />
-                      <span className="text-sm">{car.city || car.location}</span>
+                      <span className="text-sm font-medium">{car.current_city}</span>
+                      {isImmediatelyAvailable(car.current_city, 'Yaoundé') && (
+                        <span className="text-xs text-green-600 dark:text-green-400">✓ Available</span>
+                      )}
                     </div>
                   )}
                 </div>
@@ -267,10 +272,17 @@ export default function CarGrid({ cars, viewMode, mode = 'rent' }: CarGridProps)
               )}
 
               {/* Location */}
-              {(car.city || car.location) && (
-                <div className="flex items-center space-x-1 text-sm text-ekami-charcoal-600 dark:text-ekami-silver-400 mb-4">
-                  <MapPin className="w-4 h-4" />
-                  <span>{car.city || car.location}</span>
+              {car.current_city && (
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-1 text-sm text-ekami-gold-600 dark:text-ekami-gold-400">
+                    <MapPin className="w-4 h-4" />
+                    <span className="font-medium">{car.current_city}</span>
+                  </div>
+                  {isImmediatelyAvailable(car.current_city, 'Yaoundé') && (
+                    <span className="text-xs px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full font-medium">
+                      ✓ Available
+                    </span>
+                  )}
                 </div>
               )}
 
