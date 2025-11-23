@@ -20,6 +20,7 @@ export default function Header() {
     { path: '/compare', label: 'Compare' },
     { path: '/repairs', label: t('nav.repairs') },
     { path: '/sell', label: t('nav.sell') },
+    { path: '/tools', label: 'Tools' },
     { path: '/blog', label: t('nav.blog') },
   ];
 
