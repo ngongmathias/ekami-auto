@@ -15,7 +15,7 @@ interface PurchaseInquiryModalProps {
 
 interface InquiryFormData {
   name: string;
-  email: string;
+  email?: string;
   phone: string;
   message: string;
   financing_needed: boolean;

@@ -15,7 +15,7 @@ interface MakeOfferModalProps {
 
 interface OfferFormData {
   name: string;
-  email: string;
+  email?: string;
   phone: string;
   offer_amount: number;
   message: string;
