@@ -4,7 +4,7 @@
 
 -- Add current_city column
 ALTER TABLE cars 
-ADD COLUMN IF NOT EXISTS current_city VARCHAR(100) DEFAULT 'Douala';
+ADD COLUMN IF NOT EXISTS current_city VARCHAR(100) DEFAULT 'Yaoundé';
 
 -- Add index for faster queries
 CREATE INDEX IF NOT EXISTS idx_cars_current_city ON cars(current_city);
@@ -12,9 +12,9 @@ CREATE INDEX IF NOT EXISTS idx_cars_current_city ON cars(current_city);
 -- Add comment
 COMMENT ON COLUMN cars.current_city IS 'Current location of the car (city name)';
 
--- Update existing cars to have Douala as default location
+-- Update existing cars to have Yaoundé as default location
 UPDATE cars 
-SET current_city = 'Douala' 
+SET current_city = 'Yaoundé' 
 WHERE current_city IS NULL;
 
 -- Sample data: Set some cars to different cities for demonstration

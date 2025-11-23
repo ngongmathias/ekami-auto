@@ -102,7 +102,7 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-bold text-ekami-charcoal-900 dark:text-white mb-2">Location</h3>
                   <p className="text-ekami-charcoal-600 dark:text-ekami-silver-400">
-                    Douala, Cameroon
+                    Yaoundé, Cameroon
                   </p>
                 </div>
               </div>
