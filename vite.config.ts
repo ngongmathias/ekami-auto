@@ -117,7 +117,7 @@ export default defineConfig({
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           'mui-vendor': ['@mui/material', '@mui/x-data-grid', '@mui/icons-material'],
           'chart-vendor': ['chart.js', 'react-chartjs-2'],
-          'form-vendor': ['react-hook-form', 'zod'],
+          'form-vendor': ['react-hook-form'],
           'animation-vendor': ['framer-motion'],
           'map-vendor': ['@react-google-maps/api'],
           'date-vendor': ['date-fns', 'react-big-calendar'],

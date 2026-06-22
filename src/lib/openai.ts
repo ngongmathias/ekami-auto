@@ -1,16 +1,7 @@
-import OpenAI from 'openai';
-
-const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
-
-if (!OPENAI_API_KEY) {
-  console.warn('OpenAI API key is missing. Chatbot will not function.');
-}
-
-// Initialize OpenAI client
-export const openai = OPENAI_API_KEY ? new OpenAI({
-  apiKey: OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true // Required for client-side usage
-}) : null;
+// The chatbot talks to OpenAI through our own serverless function at
+// `/api/chat`, so the OpenAI key stays on the server and is never exposed in
+// the browser bundle. (Browsers also can't call api.openai.com directly — CORS.)
+const CHAT_ENDPOINT = '/api/chat';
 
 // System prompt that defines the chatbot's personality and knowledge
 export const CHATBOT_SYSTEM_PROMPT = `You are Ekami Auto's AI assistant integrated directly into the Ekami Auto website (ekamiauto.com). You are NOT a general chatbot - you are part of the Ekami Auto platform and have direct access to show customers cars, help them book, and navigate the website.
@@ -174,59 +165,45 @@ export async function sendChatMessage(
   messages: ChatMessage[],
   onStream?: (chunk: string) => void
 ): Promise<string> {
-  // If OpenAI is not configured, use mock responses
-  if (!openai) {
-    const lastUserMessage = messages.filter(m => m.role === 'user').pop();
-    return getMockResponse(lastUserMessage?.content || '');
-  }
+  const lastUserMessage = messages.filter(m => m.role === 'user').pop();
 
   try {
-    // Add system prompt if not already present
+    // Add the system prompt; the server relays the messages to OpenAI.
     const messagesWithSystem: ChatMessage[] = [
       { role: 'system', content: CHATBOT_SYSTEM_PROMPT },
       ...messages.filter(m => m.role !== 'system')
     ];
 
-    if (onStream) {
-      // Streaming response
-      const stream = await openai.chat.completions.create({
-        model: 'gpt-4o-mini', // Using mini for cost efficiency
+    const res = await fetch(CHAT_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
         messages: messagesWithSystem,
         temperature: 0.7,
         max_tokens: 500,
-        stream: true,
-      });
+      }),
+    });
 
-      let fullResponse = '';
-      for await (const chunk of stream) {
-        const content = chunk.choices[0]?.delta?.content || '';
-        fullResponse += content;
-        onStream(content);
-      }
-
-      return fullResponse;
-    } else {
-      // Non-streaming response
-      const response = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: messagesWithSystem,
-        temperature: 0.7,
-        max_tokens: 500,
-      });
-
-      return response.choices[0]?.message?.content || 'Sorry, I could not generate a response.';
+    if (!res.ok) {
+      // Quota, rate limit, missing key, etc. — degrade gracefully to a mock.
+      const err = await res.json().catch(() => ({}));
+      console.warn('AI endpoint error, using mock response:', err);
+      const fallback = getMockResponse(lastUserMessage?.content || '');
+      if (onStream) onStream(fallback);
+      return fallback;
     }
-  } catch (error: any) {
-    console.error('OpenAI API error:', error);
-    
-    // If quota exceeded or rate limit, use mock response
-    if (error?.status === 429 || error?.code === 'insufficient_quota') {
-      console.warn('OpenAI quota exceeded, using mock responses');
-      const lastUserMessage = messages.filter(m => m.role === 'user').pop();
-      return getMockResponse(lastUserMessage?.content || '');
-    }
-    
-    throw new Error('Failed to get response from AI. Please try again.');
+
+    const data = await res.json();
+    const content = data.content || getMockResponse(lastUserMessage?.content || '');
+    // We don't stream token-by-token through the proxy; emit the full text once
+    // so callers that pass onStream still render the response.
+    if (onStream) onStream(content);
+    return content;
+  } catch (error) {
+    console.error('AI request failed, using mock response:', error);
+    const fallback = getMockResponse(lastUserMessage?.content || '');
+    if (onStream) onStream(fallback);
+    return fallback;
   }
 }
 
@@ -234,28 +211,29 @@ export async function sendChatMessage(
  * Generate a conversation summary for admin view
  */
 export async function generateConversationSummary(messages: ChatMessage[]): Promise<string> {
-  if (!openai) {
-    return 'Summary unavailable - OpenAI not configured';
-  }
-
   try {
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: 'Summarize this customer service conversation in 1-2 sentences. Focus on the customer\'s main question or need.'
-        },
-        {
-          role: 'user',
-          content: messages.map(m => `${m.role}: ${m.content}`).join('\n')
-        }
-      ],
-      temperature: 0.5,
-      max_tokens: 100,
+    const res = await fetch(CHAT_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [
+          {
+            role: 'system',
+            content: 'Summarize this customer service conversation in 1-2 sentences. Focus on the customer\'s main question or need.'
+          },
+          {
+            role: 'user',
+            content: messages.map(m => `${m.role}: ${m.content}`).join('\n')
+          }
+        ],
+        temperature: 0.5,
+        max_tokens: 100,
+      }),
     });
 
-    return response.choices[0]?.message?.content || 'No summary available';
+    if (!res.ok) return 'Summary unavailable';
+    const data = await res.json();
+    return data.content || 'No summary available';
   } catch (error) {
     console.error('Failed to generate summary:', error);
     return 'Summary generation failed';
