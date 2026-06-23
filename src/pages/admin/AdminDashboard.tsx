@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import {
@@ -118,6 +118,35 @@ export default function AdminDashboard() {
     }
   }, [isSignedIn]);
 
+  // Show a clear authorization popup once, so admins get explicit confirmation
+  // they're allowed in (and non-admins are told plainly they are not).
+  const accessNotifiedRef = useRef(false);
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn || accessNotifiedRef.current) return;
+    accessNotifiedRef.current = true;
+
+    const adminEmails = ['kerryngong@ekamiauto.com', 'kerryngong@gmail.com', 'mathiasngongngai@gmail.com'];
+    const email = (
+      user?.emailAddresses?.[0]?.emailAddress ||
+      user?.primaryEmailAddress?.emailAddress ||
+      (user as any)?.email ||
+      ''
+    ).toLowerCase();
+    const authorized = adminEmails.includes(email);
+
+    if (authorized) {
+      toast.success(
+        `Access granted — you're authorized as an admin${(user as any)?.firstName ? ', ' + (user as any).firstName : ''}.`,
+        { duration: 5000, icon: '✅' }
+      );
+    } else {
+      toast.error(
+        `Access denied — ${email || 'this account'} is not authorized for the admin dashboard.`,
+        { duration: 6000, icon: '🚫' }
+      );
+    }
+  }, [isLoaded, isSignedIn, user]);
+
   if (!isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -137,11 +166,6 @@ export default function AdminDashboard() {
   const userEmail = user?.emailAddresses?.[0]?.emailAddress || 
                     user?.primaryEmailAddress?.emailAddress ||
                     user?.email;
-  
-  // Debug logging
-  console.log('Admin Check - User object:', user);
-  console.log('Admin Check - Extracted email:', userEmail);
-  console.log('Admin Check - Is admin?:', adminEmails.includes(userEmail || ''));
   
   const isAdmin = userEmail ? adminEmails.includes(userEmail.toLowerCase()) : false;
 
