@@ -255,7 +255,7 @@ export default function CarDetailPage() {
             </button>
 
             <SocialShare
-              url={`/car/${car.slug || car.id}`}
+              url={`/cars/${car.slug || car.id}`}
               title={`${car.make} ${car.model} (${car.year})`}
               description={`${car.description || ''} - Available for ${car.available_for_rent ? 'rent' : 'sale'} at Ekami Auto`}
               imageUrl={car.images?.[0]}

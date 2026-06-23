@@ -25,6 +25,17 @@
       "destination": "/api/car-og?id=:id"
     },
     {
+      "source": "/car/:id",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(bot|crawler|spider|facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegram|slack|discord|pinterest).*"
+        }
+      ],
+      "destination": "/api/car-og?id=:id"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

@@ -72,6 +72,8 @@ function App() {
                       <Route path="repairs/request" element={<ServiceRequestPage />} />
                       <Route path="sell" element={<SellCarPage />} />
                       <Route path="cars/:id" element={<CarDetailPage />} />
+                      {/* Singular alias so older shared /car/:id links still resolve */}
+                      <Route path="car/:id" element={<CarDetailPage />} />
                       <Route path="book/:id" element={<BookingPage />} />
                       <Route path="payment" element={<PaymentPage />} />
                       <Route path="payment/success" element={<PaymentSuccessPage />} />

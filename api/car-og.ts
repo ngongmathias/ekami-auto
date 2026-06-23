@@ -35,8 +35,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     if (id && supabaseUrl && anonKey) {
+      // The route param may be a UUID (id) or a slug — match whichever it is.
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+      const filter = isUuid
+        ? `id=eq.${encodeURIComponent(id)}`
+        : `slug=eq.${encodeURIComponent(id)}`;
       const r = await fetch(
-        `${supabaseUrl}/rest/v1/cars?id=eq.${encodeURIComponent(id)}&select=make,model,year,body_type,transmission,seats,price_rent_daily,price_sale,location,current_city,images,description&limit=1`,
+        `${supabaseUrl}/rest/v1/cars?${filter}&select=make,model,year,body_type,transmission,seats,price_rent_daily,price_sale,location,current_city,images,description&limit=1`,
         { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } }
       );
       const rows = await r.json();

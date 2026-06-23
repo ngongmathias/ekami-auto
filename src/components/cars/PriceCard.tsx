@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Calendar, Phone, MessageCircle, ShoppingCart, CheckCircle, TrendingUp, Calculator, GitCompare } from 'lucide-react';
+import { Calendar, Phone, MessageCircle, ShoppingCart, CheckCircle, TrendingUp, Calculator, GitCompare, Share2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import type { Car } from '../../lib/supabase';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import PurchaseInquiryModal from './PurchaseInquiryModal';
@@ -21,6 +22,34 @@ export default function PriceCard({ car }: PriceCardProps) {
   const whatsappMessage = encodeURIComponent(
     `Hello! I'm interested in the ${car.make} ${car.model} (${car.year}). Can you provide more information?`
   );
+
+  const shareUrl = `https://ekamiauto.com/cars/${car.slug || car.id}`;
+  const shareTitle = `${car.make} ${car.model} (${car.year}) — Ekami Auto`;
+  const shareText = `Check out this ${car.make} ${car.model} on Ekami Auto`;
+
+  const handleShareCar = async () => {
+    // Use the phone's native share sheet when available (best for WhatsApp).
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: shareTitle, text: shareText, url: shareUrl });
+        return;
+      } catch {
+        return; // user dismissed the share sheet
+      }
+    }
+    // Desktop fallback: open WhatsApp web with the link.
+    window.open(
+      `https://wa.me/?text=${encodeURIComponent(`${shareText}\n${shareUrl}`)}`,
+      '_blank',
+      'noopener,noreferrer'
+    );
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success('Link copied — share it anywhere!');
+    } catch {
+      /* clipboard not available; the WhatsApp window already opened */
+    }
+  };
 
   return (
     <div className="sticky top-24">
@@ -131,6 +160,15 @@ export default function PriceCard({ car }: PriceCardProps) {
               </button>
             </>
           )}
+
+          {/* Share Button */}
+          <button
+            onClick={handleShareCar}
+            className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-ekami-gold-500 hover:bg-ekami-gold-600 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+          >
+            <Share2 className="w-5 h-5" />
+            <span>Share This Car</span>
+          </button>
 
           {/* Compare Button */}
           <Link
