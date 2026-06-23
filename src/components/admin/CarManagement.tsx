@@ -71,23 +71,30 @@ export default function CarManagement() {
     if (!window.confirm('Are you sure you want to delete this car?')) return;
 
     try {
-      // In production: await supabase.from('cars').delete().eq('id', carId);
+      const { error } = await supabase.from('cars').delete().eq('id', carId);
+      if (error) throw error;
       toast.success('Car deleted successfully');
       setCars(prev => prev.filter(car => car.id !== carId));
-    } catch (error) {
-      toast.error('Failed to delete car');
+    } catch (error: any) {
+      console.error('Error deleting car:', error);
+      toast.error(error.message || 'Failed to delete car');
     }
   };
 
   const handleToggleAvailability = async (car: Car) => {
     try {
-      // In production: await supabase.from('cars').update({ available_for_rent: !car.available_for_rent }).eq('id', car.id);
+      const { error } = await supabase
+        .from('cars')
+        .update({ available_for_rent: !car.available_for_rent })
+        .eq('id', car.id);
+      if (error) throw error;
       toast.success(`Car ${!car.available_for_rent ? 'marked as available' : 'marked as unavailable'}`);
-      setCars(prev => prev.map(c => 
+      setCars(prev => prev.map(c =>
         c.id === car.id ? { ...c, available_for_rent: !c.available_for_rent } : c
       ));
-    } catch (error) {
-      toast.error('Failed to update car status');
+    } catch (error: any) {
+      console.error('Error updating car status:', error);
+      toast.error(error.message || 'Failed to update car status');
     }
   };
 
