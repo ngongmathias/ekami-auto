@@ -42,6 +42,13 @@ export default function ChatWidget() {
     }
   }, [isOpen]);
 
+  // Allow other parts of the app (e.g. the "Talk to AI" hero button) to open the chat.
+  useEffect(() => {
+    const openChat = () => setIsOpen(true);
+    window.addEventListener('ekami:open-chat', openChat);
+    return () => window.removeEventListener('ekami:open-chat', openChat);
+  }, []);
+
   // Load existing conversation when chat opens
   useEffect(() => {
     if (isOpen && !conversationId) {

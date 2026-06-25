@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Search, Car, Wrench, DollarSign, Star, TrendingUp, Shield } from 'lucide-react';
+import { Car, DollarSign, TrendingUp, Shield, CheckCircle, MapPin, Sparkles, Clock, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { getAvailableCarsForRent, type Car as CarType } from '../lib/supabase';
@@ -49,10 +49,17 @@ export default function HomePage() {
   ];
 
   const categories = [
-    { name: t('categories.suv'), image: '/images/suv.jpg', count: 45 },
-    { name: t('categories.sedan'), image: '/images/sedan.jpg', count: 62 },
-    { name: t('categories.pickup'), image: '/images/pickup.jpg', count: 28 },
-    { name: t('categories.luxury'), image: '/images/luxury.jpg', count: 15 },
+    { name: t('categories.suv'), image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=600&q=80', query: 'suv' },
+    { name: t('categories.sedan'), image: 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=600&q=80', query: 'sedan' },
+    { name: t('categories.pickup'), image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=600&q=80', query: 'pickup' },
+    { name: t('categories.luxury'), image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&q=80', query: 'luxury' },
+  ];
+
+  const trustBadges = [
+    { icon: <CheckCircle className="w-4 h-4 text-ekami-gold-400" />, label: 'Verified vehicles' },
+    { icon: <Sparkles className="w-4 h-4 text-ekami-gold-400" />, label: 'AI-powered assistance' },
+    { icon: <MapPin className="w-4 h-4 text-ekami-gold-400" />, label: 'Across Cameroon' },
+    { icon: <Clock className="w-4 h-4 text-ekami-gold-400" />, label: '24/7 WhatsApp support' },
   ];
 
   return (
@@ -84,9 +91,23 @@ export default function HomePage() {
               >
                 {t('hero.searchCars')}
               </Link>
-              <button className="px-10 py-5 bg-gradient-to-r from-ekami-gold-500 to-ekami-gold-600 text-white rounded-2xl font-bold hover:from-ekami-gold-600 hover:to-ekami-gold-700 transition-all shadow-2xl hover:shadow-ekami-gold-500/50 transform hover:-translate-y-1 hover:scale-105">
+              <button
+                onClick={() => window.dispatchEvent(new Event('ekami:open-chat'))}
+                className="px-10 py-5 bg-gradient-to-r from-ekami-gold-500 to-ekami-gold-600 text-white rounded-2xl font-bold hover:from-ekami-gold-600 hover:to-ekami-gold-700 transition-all shadow-2xl hover:shadow-ekami-gold-500/50 transform hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-2"
+              >
+                <Sparkles className="w-5 h-5" />
                 {t('hero.talkToAI')}
               </button>
+            </div>
+
+            {/* Trust badges */}
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-ekami-silver-200">
+              {trustBadges.map((badge) => (
+                <span key={badge.label} className="flex items-center gap-2">
+                  {badge.icon}
+                  {badge.label}
+                </span>
+              ))}
             </div>
           </motion.div>
 
@@ -254,16 +275,25 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="group cursor-pointer"
               >
-                <div className="relative h-48 bg-gray-200 dark:bg-gray-700 rounded-xl overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <h3 className="text-xl font-bold text-white mb-1">{category.name}</h3>
-                    <p className="text-sm text-gray-200">{category.count} cars available</p>
+                <Link
+                  to={`/rent?category=${category.query}`}
+                  className="group block relative h-48 rounded-2xl overflow-hidden shadow-lg"
+                >
+                  <img
+                    src={category.image}
+                    alt={category.name}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent"></div>
+                  <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+                    <h3 className="text-xl font-bold text-white">{category.name}</h3>
+                    <span className="flex items-center gap-1 text-sm font-semibold text-ekami-gold-300 translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all">
+                      Explore <ArrowRight className="w-4 h-4" />
+                    </span>
                   </div>
-                  <div className="absolute inset-0 bg-ekami-blue-600/0 group-hover:bg-ekami-blue-600/20 transition-all duration-300"></div>
-                </div>
+                </Link>
               </motion.div>
             ))}
           </div>

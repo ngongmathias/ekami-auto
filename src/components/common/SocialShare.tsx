@@ -10,9 +10,13 @@ interface SocialShareProps {
   description?: string;
   imageUrl?: string;
   hashtags?: string[];
+  /** 'prominent' renders a full-width branded button (same menu/behavior). */
+  variant?: 'default' | 'prominent';
+  /** Custom trigger label (defaults to "Share"). */
+  label?: string;
 }
 
-export default function SocialShare({ url, title, description, imageUrl, hashtags }: SocialShareProps) {
+export default function SocialShare({ url, title, description, imageUrl, hashtags, variant = 'default', label = 'Share' }: SocialShareProps) {
   const [isOpen, setIsOpen] = useState(false);
   const analytics = useAnalytics();
   const fullUrl = url.startsWith('http') ? url : `https://ekamiauto.com${url}`;
@@ -102,15 +106,19 @@ export default function SocialShare({ url, title, description, imageUrl, hashtag
     },
   ];
 
+  const triggerClass = variant === 'prominent'
+    ? 'w-full flex items-center justify-center gap-2 px-6 py-3 bg-ekami-gold-500 hover:bg-ekami-gold-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all'
+    : 'flex items-center gap-2 px-4 py-2 bg-ekami-silver-100 dark:bg-ekami-charcoal-700 hover:bg-ekami-silver-200 dark:hover:bg-ekami-charcoal-600 text-ekami-charcoal-700 dark:text-ekami-silver-300 rounded-lg transition-colors';
+
   return (
-    <div className="relative">
+    <div className={variant === 'prominent' ? 'relative w-full' : 'relative'}>
       <button
         onClick={handleNativeShare}
-        className="flex items-center gap-2 px-4 py-2 bg-ekami-silver-100 dark:bg-ekami-charcoal-700 hover:bg-ekami-silver-200 dark:hover:bg-ekami-charcoal-600 text-ekami-charcoal-700 dark:text-ekami-silver-300 rounded-lg transition-colors"
+        className={triggerClass}
         aria-label="Share"
       >
         <Share2 className="w-5 h-5" />
-        <span className="font-medium">Share</span>
+        <span className="font-medium">{label}</span>
       </button>
 
       <AnimatePresence>
