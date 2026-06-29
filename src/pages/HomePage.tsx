@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Car, DollarSign, TrendingUp, Shield, CheckCircle, MapPin, Sparkles, Clock, ArrowRight } from 'lucide-react';
+import { Car, DollarSign, TrendingUp, Shield, CheckCircle, MapPin, Sparkles, Clock, ArrowRight, Search, CalendarCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { getAvailableCarsForRent, type Car as CarType } from '../lib/supabase';
@@ -60,6 +60,24 @@ export default function HomePage() {
     { icon: <Sparkles className="w-4 h-4 text-ekami-gold-400" />, label: 'AI-powered assistance' },
     { icon: <MapPin className="w-4 h-4 text-ekami-gold-400" />, label: 'Across Cameroon' },
     { icon: <Clock className="w-4 h-4 text-ekami-gold-400" />, label: '24/7 WhatsApp support' },
+  ];
+
+  const steps = [
+    {
+      icon: <Search className="w-7 h-7" />,
+      title: 'Browse & Search',
+      description: 'Explore our verified fleet or ask the AI assistant to find the perfect car for your trip.',
+    },
+    {
+      icon: <CalendarCheck className="w-7 h-7" />,
+      title: 'Book or Enquire',
+      description: 'Reserve your dates online or reach us instantly on WhatsApp — no account required.',
+    },
+    {
+      icon: <Car className="w-7 h-7" />,
+      title: 'Pick Up & Drive',
+      description: 'Collect your car at a convenient location across Cameroon and hit the road.',
+    },
   ];
 
   return (
@@ -252,6 +270,46 @@ export default function HomePage() {
               </Link>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-16 bg-gradient-to-b from-ekami-gold-50/40 to-white dark:from-ekami-charcoal-800 dark:to-ekami-charcoal-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-ekami-charcoal-900 dark:text-white mb-4">
+              How It Works
+            </h2>
+            <p className="text-xl text-ekami-charcoal-600 dark:text-ekami-silver-300">
+              Get on the road in three simple steps
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {steps.map((step, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.15 }}
+                viewport={{ once: true }}
+                className="relative text-center px-4"
+              >
+                <div className="relative inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-ekami-gold-500 to-ekami-gold-600 text-white shadow-lg mb-5">
+                  {step.icon}
+                  <span className="absolute -top-2 -right-2 w-7 h-7 flex items-center justify-center rounded-full bg-ekami-charcoal-900 text-white text-sm font-bold border-2 border-white dark:border-ekami-charcoal-900">
+                    {index + 1}
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold mb-2 text-ekami-charcoal-900 dark:text-white">
+                  {step.title}
+                </h3>
+                <p className="text-ekami-charcoal-600 dark:text-ekami-silver-400">
+                  {step.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 

@@ -11,6 +11,7 @@ import {
   ArrowUpDown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getAvailableCarsForRent, type Car } from '../lib/supabase';
 import FilterSidebar from '../components/cars/FilterSidebar';
@@ -34,14 +35,26 @@ export default function RentPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
+  const [searchParams] = useSearchParams();
+  const categoryParam = searchParams.get('category');
+
   const [filters, setFilters] = useState({
     priceRange: [0, 50000000] as [number, number],
-    bodyTypes: [] as string[],
+    bodyTypes: categoryParam ? [categoryParam] : [] as string[],
     transmissions: [] as string[],
     fuelTypes: [] as string[],
     seats: [] as string[],
     cities: [] as string[],
   });
+
+  // Apply (or update) the body-type filter when arriving via a category link.
+  useEffect(() => {
+    const cat = searchParams.get('category');
+    if (cat) {
+      setFilters(prev => ({ ...prev, bodyTypes: [cat] }));
+      setCurrentPage(1);
+    }
+  }, [searchParams]);
 
   // Fetch cars
   useEffect(() => {
@@ -96,10 +109,11 @@ export default function RentPage() {
       return price >= filters.priceRange[0] && price <= filters.priceRange[1];
     });
 
-    // Body type filter
+    // Body type filter (case-insensitive so category links match any casing)
     if (filters.bodyTypes.length > 0) {
+      const wanted = filters.bodyTypes.map(b => b.toLowerCase());
       filtered = filtered.filter(car =>
-        car.body_type && filters.bodyTypes.includes(car.body_type)
+        car.body_type && wanted.includes(car.body_type.toLowerCase())
       );
     }
 
