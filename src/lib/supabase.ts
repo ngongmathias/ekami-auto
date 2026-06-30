@@ -298,6 +298,22 @@ export async function getCarById(id: string) {
 }
 
 /**
+ * Get approved customer reviews (newest first) for homepage testimonials.
+ */
+export async function getApprovedReviews(limit = 6) {
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('id, user_name, rating, title, comment, created_at')
+    .eq('status', 'approved')
+    .not('comment', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+  return data || [];
+}
+
+/**
  * Get published blog posts
  */
 export async function getPublishedBlogPosts(limit = 10) {

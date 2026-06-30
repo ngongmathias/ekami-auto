@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Car, DollarSign, TrendingUp, Shield, CheckCircle, MapPin, Sparkles, Clock, ArrowRight, Search, CalendarCheck, Wrench, ShoppingCart } from 'lucide-react';
+import { Car, DollarSign, TrendingUp, Shield, CheckCircle, MapPin, Sparkles, Clock, ArrowRight, Search, CalendarCheck, Wrench, ShoppingCart, Star, Quote } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { getAvailableCarsForRent, type Car as CarType } from '../lib/supabase';
+import { getAvailableCarsForRent, getApprovedReviews, type Car as CarType } from '../lib/supabase';
 import toast from 'react-hot-toast';
 import DynamicSearchBox from '../components/home/DynamicSearchBox';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -13,6 +13,7 @@ export default function HomePage() {
   const { formatPrice } = useCurrency();
   const [featuredCars, setFeaturedCars] = useState<CarType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState<any[]>([]);
 
   // Fetch featured cars from Supabase
   useEffect(() => {
@@ -28,6 +29,13 @@ export default function HomePage() {
       }
     }
     fetchCars();
+  }, []);
+
+  // Fetch approved customer reviews for the testimonials section
+  useEffect(() => {
+    getApprovedReviews(6)
+      .then(setReviews)
+      .catch((err) => console.error('Error fetching reviews:', err));
   }, []);
 
   const features = [
@@ -406,6 +414,56 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Testimonials (shown only when there are approved reviews) */}
+      {reviews.length > 0 && (
+        <section className="py-16 bg-white dark:bg-ekami-charcoal-900">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-display font-bold text-ekami-charcoal-900 dark:text-white mb-4">
+                What Our Customers Say
+              </h2>
+              <p className="text-xl text-ekami-charcoal-600 dark:text-ekami-silver-300">
+                Real reviews from Ekami Auto customers
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {reviews.map((review, index) => (
+                <motion.div
+                  key={review.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="card flex flex-col"
+                >
+                  <Quote className="w-8 h-8 text-ekami-gold-400/50 mb-3" />
+                  <div className="flex mb-3">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <Star
+                        key={s}
+                        className={`w-4 h-4 ${s <= review.rating ? 'text-ekami-gold-500 fill-current' : 'text-ekami-silver-300 dark:text-ekami-charcoal-600'}`}
+                      />
+                    ))}
+                  </div>
+                  {review.title && (
+                    <h3 className="font-bold text-ekami-charcoal-900 dark:text-white mb-1">
+                      {review.title}
+                    </h3>
+                  )}
+                  <p className="text-ekami-charcoal-600 dark:text-ekami-silver-400 mb-4 flex-1">
+                    “{review.comment}”
+                  </p>
+                  <p className="font-semibold text-ekami-charcoal-900 dark:text-white">
+                    — {review.user_name || 'Verified customer'}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="py-16 bg-gradient-to-r from-ekami-charcoal-900 via-ekami-silver-800 to-ekami-charcoal-900 text-white relative overflow-hidden">
