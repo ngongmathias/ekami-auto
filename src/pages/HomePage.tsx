@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Car, DollarSign, TrendingUp, Shield, CheckCircle, MapPin, Sparkles, Clock, ArrowRight, Search, CalendarCheck } from 'lucide-react';
+import { Car, DollarSign, TrendingUp, Shield, CheckCircle, MapPin, Sparkles, Clock, ArrowRight, Search, CalendarCheck, Wrench, ShoppingCart } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { getAvailableCarsForRent, type Car as CarType } from '../lib/supabase';
@@ -60,6 +60,13 @@ export default function HomePage() {
     { icon: <Sparkles className="w-4 h-4 text-ekami-gold-400" />, label: 'AI-powered assistance' },
     { icon: <MapPin className="w-4 h-4 text-ekami-gold-400" />, label: 'Across Cameroon' },
     { icon: <Clock className="w-4 h-4 text-ekami-gold-400" />, label: '24/7 WhatsApp support' },
+  ];
+
+  const services = [
+    { icon: <Car className="w-7 h-7" />, title: 'Rent a Car', description: 'Daily, weekly & monthly rentals across Cameroon.', to: '/rent' },
+    { icon: <ShoppingCart className="w-7 h-7" />, title: 'Buy a Car', description: 'Quality, verified vehicles for sale at fair prices.', to: '/buy' },
+    { icon: <DollarSign className="w-7 h-7" />, title: 'Sell Your Car', description: 'Get a fair offer and sell your car with ease.', to: '/sell' },
+    { icon: <Wrench className="w-7 h-7" />, title: 'Repairs & Service', description: 'Professional maintenance by certified mechanics.', to: '/repairs' },
   ];
 
   const steps = [
@@ -161,6 +168,48 @@ export default function HomePage() {
                   {feature.title}
                 </h3>
                 <p className="text-ekami-charcoal-600 dark:text-ekami-silver-400">{feature.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Our Services */}
+      <section className="py-16 bg-gradient-to-b from-ekami-silver-50 to-white dark:from-ekami-charcoal-800 dark:to-ekami-charcoal-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-ekami-charcoal-900 dark:text-white mb-4">
+              Everything Automotive, One Place
+            </h2>
+            <p className="text-xl text-ekami-charcoal-600 dark:text-ekami-silver-300">
+              Rent, buy, sell, or service your car with Ekami Auto
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {services.map((service, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <Link to={service.to} className="group block card h-full transform hover:-translate-y-1 transition-all">
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-ekami-gold-500 to-ekami-gold-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                    {service.icon}
+                  </div>
+                  <h3 className="text-xl font-bold mb-2 text-ekami-charcoal-900 dark:text-white">
+                    {service.title}
+                  </h3>
+                  <p className="text-ekami-charcoal-600 dark:text-ekami-silver-400 mb-4">
+                    {service.description}
+                  </p>
+                  <span className="inline-flex items-center gap-1 text-ekami-gold-600 dark:text-ekami-gold-400 font-semibold">
+                    Learn more
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </Link>
               </motion.div>
             ))}
           </div>
